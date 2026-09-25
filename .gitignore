@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ================================
 # Dependencies
 # ================================
@@ -29,11 +30,16 @@ coverage/
 # Logs
 # ================================
 logs/
+=======
+# Logs
+logs
+>>>>>>> d405af4c8031a021c74f0c6e77662a5e76d56560
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+<<<<<<< HEAD
 
 # ================================
 # Cache
@@ -156,3 +162,23 @@ firestore-debug.log
 # ================================
 .Dockerfile.local
 docker-compose.override.yml
+=======
+lerna-debug.log*
+
+node_modules
+.env
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+>>>>>>> d405af4c8031a021c74f0c6e77662a5e76d56560
