@@ -2,6 +2,8 @@ import userModel from "../models/userModels.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
+import razorpay from "razorpay"
+
 
 // login user
 const loginUser = async (req, res) => {

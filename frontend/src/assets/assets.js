@@ -140,13 +140,6 @@ export const food_list = [
         description: "Food provides essential nutrients for overall health and well-being",
         category: "Salad"
     }, {
-        _id: "4",
-        name: "Chicken Salad",
-        image: food_4,
-        price: 24,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Salad"
-    }, {
         _id: "5",
         name: "Lasagna Rolls",
         image: food_5,
@@ -158,13 +151,6 @@ export const food_list = [
         name: "Peri Peri Rolls",
         image: food_6,
         price: 12,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Rolls"
-    }, {
-        _id: "7",
-        name: "Chicken Rolls",
-        image: food_7,
-        price: 20,
         description: "Food provides essential nutrients for overall health and well-being",
         category: "Rolls"
     }, {
@@ -281,13 +267,6 @@ export const food_list = [
         price: 10,
         description: "Food provides essential nutrients for overall health and well-being",
         category: "Pure Veg"
-    }, {
-        _id: "24",
-        name: "Rice Zucchini",
-        image: food_24,
-        price: 12,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Pure Veg"
     },
     {
         _id: "25",
@@ -309,13 +288,6 @@ export const food_list = [
         name: "Creamy Pasta",
         image: food_27,
         price: 16,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Pasta"
-    }, {
-        _id: "28",
-        name: "Chicken Pasta",
-        image: food_28,
-        price: 24,
         description: "Food provides essential nutrients for overall health and well-being",
         category: "Pasta"
     }, {

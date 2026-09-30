@@ -7,6 +7,9 @@ const cart = () => {
 
   const { cartItems, food_list, removeFromCart, getTotalCartAmount, url  } = useContext(StoreContext);
   const navigate = useNavigate();
+  const totalAmount = getTotalCartAmount();
+  const isCartEmpty = totalAmount === 0;
+
   return (
     <div className='cart'>
       <div className="cart-items">
@@ -28,7 +31,10 @@ const cart = () => {
 
             return (
 
-              <div className='cart-items-title cart-items-item'>
+              <div
+                key={item._id}
+                className='cart-items-title cart-items-item'
+              >
                 <img src={imageUrl} alt={item.name} />
                 <p>{item.name}</p>
                 <p>${item.price}</p>
@@ -46,19 +52,25 @@ const cart = () => {
           <div>
             <div className='cart-total-details'>
               <p>Subtotal</p>
-              <p>${getTotalCartAmount()}</p>
+              <p>${totalAmount}</p>
             </div>
             <div className='cart-total-details'>
               <p>Delivery Fee</p>
-              <p>${getTotalCartAmount()===0?0:2}</p>
+              <p>${isCartEmpty ? 0 : 2}</p>
             </div>
             <div className='cart-total-details'>
               <b>Total</b>
-              <b>${getTotalCartAmount()===0?0:getTotalCartAmount() + 2}</b>
+              <b>${isCartEmpty ? 0 : totalAmount + 2}</b>
             </div>
 
           </div>
-          <button onClick={() => navigate('/order')}>PROCEED TO CHECKOUT</button>
+          <button
+            onClick={() => !isCartEmpty && navigate('/order')}
+            disabled={isCartEmpty}
+            style={{ opacity: isCartEmpty ? 0.5 : 1, cursor: isCartEmpty ? 'not-allowed' : 'pointer' }}
+          >
+            PROCEED TO CHECKOUT
+          </button>
         </div>
         <div className="cart-promocode">
           <div>

@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import axios from 'axios';
 
 import './Navbar.css';
 
@@ -11,16 +12,40 @@ import { StoreContext } from '../../context/StoreContext';
 const Navbar = ({ setShowLogin }) => {
 
   const [menu, setMenu] = useState("home");
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
-  const { getTotalCartAmount, token, setToken } = useContext(StoreContext);
+  const { getTotalCartAmount, token, setToken, food_list, addToCart, url } = useContext(StoreContext);
   const navigate = useNavigate();
-
 
   const logout = () => {
     localStorage.removeItem("token");
     setToken("");
     navigate("/");
 
+  }
+
+  const handleSearch = async (value) => {
+    const query = value.trim();
+    setSearchText(value);
+
+    if (!query) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${url}/api/food/search`, { params: { q: query } });
+      setSearchResults(response.data?.data || []);
+    } catch (error) {
+      const filtered = food_list.filter((item) =>
+        `${item.name} ${item.description} ${item.category}`
+          .toLowerCase()
+          .includes(query.toLowerCase())
+      );
+      setSearchResults(filtered);
+    }
   }
 
   return (
@@ -68,7 +93,9 @@ const Navbar = ({ setShowLogin }) => {
 
       <div className="navbar-right">
 
-        <img src={assets.search_icon} alt="" />
+        <button type='button' className='search-trigger' onClick={() => setShowSearch(true)}>
+          <img src={assets.search_icon} alt="Search" />
+        </button>
 
         <div className="navbar-search-icon">
 
@@ -95,7 +122,7 @@ const Navbar = ({ setShowLogin }) => {
 
             <ul className='nav-profile-dropdown'>
 
-              <li>
+              <li onClick={() => navigate('/orders')}>
                 <img src={assets.bag_icon} alt="" />
                 <p>Orders</p>
               </li>
@@ -114,6 +141,47 @@ const Navbar = ({ setShowLogin }) => {
         )}
 
       </div>
+
+      {showSearch && (
+        <div className='search-overlay' onClick={() => setShowSearch(false)}>
+          <div className='search-panel' onClick={(event) => event.stopPropagation()}>
+            <div className='search-header'>
+              <input
+                type='text'
+                value={searchText}
+                onChange={(event) => handleSearch(event.target.value)}
+                placeholder='Search dishes, category or ingredients'
+                autoFocus
+              />
+              <button type='button' onClick={() => setShowSearch(false)}>Close</button>
+            </div>
+
+            <div className='search-results'>
+              {searchResults.length === 0 ? (
+                <p className='no-result'>No item found.</p>
+              ) : (
+                searchResults.map((item) => {
+                  const imageUrl = item.image?.startsWith('/') ? item.image : `${url}/images/${item.image}`;
+
+                  return (
+                    <div key={item._id} className='search-item'>
+                      <img src={imageUrl} alt={item.name} />
+                      <div className='search-item-info'>
+                        <h4>{item.name}</h4>
+                        <p>{item.description}</p>
+                        <div className='search-item-footer'>
+                          <span>${item.price}</span>
+                          <button type='button' onClick={() => addToCart(item._id)}>Add</button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

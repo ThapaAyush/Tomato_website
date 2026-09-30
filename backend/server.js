@@ -6,6 +6,8 @@ import foodRouter from "./routes/foodRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import 'dotenv/config'
 import cartRouter from "./routes/cartRoutes.js";
+import orderRouter from "./routes/orderRoute.js";
+import foodModel from "./models/foodModel.js";
 
 // app config
 const app = express();
@@ -22,14 +24,61 @@ app.use("/api/food",foodRouter)
 app.use("/images",express.static('uploads'))
 app.use("/api/user",userRouter)
 app.use("/api/cart",cartRouter)
+app.use("/api/order",orderRouter)
 
+const defaultFoods = [
+  { name: "Greek salad", description: "Food provides essential nutrients for overall health and well-being", price: 12, category: "Salad", image: "food_1.png" },
+  { name: "Veg salad", description: "Food provides essential nutrients for overall health and well-being", price: 18, category: "Salad", image: "food_2.png" },
+  { name: "Clover Salad", description: "Food provides essential nutrients for overall health and well-being", price: 16, category: "Salad", image: "food_3.png" },
+  { name: "Lasagna Rolls", description: "Food provides essential nutrients for overall health and well-being", price: 14, category: "Rolls", image: "food_5.png" },
+  { name: "Peri Peri Rolls", description: "Food provides essential nutrients for overall health and well-being", price: 12, category: "Rolls", image: "food_6.png" },
+  { name: "Veg Rolls", description: "Food provides essential nutrients for overall health and well-being", price: 15, category: "Rolls", image: "food_8.png" },
+  { name: "Ripple Ice Cream", description: "Food provides essential nutrients for overall health and well-being", price: 14, category: "Deserts", image: "food_9.png" },
+  { name: "Fruit Ice Cream", description: "Food provides essential nutrients for overall health and well-being", price: 22, category: "Deserts", image: "food_10.png" },
+  { name: "Jar Ice Cream", description: "Food provides essential nutrients for overall health and well-being", price: 10, category: "Deserts", image: "food_11.png" },
+  { name: "Vanilla Ice Cream", description: "Food provides essential nutrients for overall health and well-being", price: 12, category: "Deserts", image: "food_12.png" },
+  { name: "Chicken Sandwich", description: "Food provides essential nutrients for overall health and well-being", price: 12, category: "Sandwich", image: "food_13.png" },
+  { name: "Vegan Sandwich", description: "Food provides essential nutrients for overall health and well-being", price: 18, category: "Sandwich", image: "food_14.png" },
+  { name: "Grilled Sandwich", description: "Food provides essential nutrients for overall health and well-being", price: 16, category: "Sandwich", image: "food_15.png" },
+  { name: "Bread Sandwich", description: "Food provides essential nutrients for overall health and well-being", price: 24, category: "Sandwich", image: "food_16.png" },
+  { name: "Cup Cake", description: "Food provides essential nutrients for overall health and well-being", price: 14, category: "Cake", image: "food_17.png" },
+  { name: "Vegan Cake", description: "Food provides essential nutrients for overall health and well-being", price: 12, category: "Cake", image: "food_18.png" },
+  { name: "Butterscotch Cake", description: "Food provides essential nutrients for overall health and well-being", price: 20, category: "Cake", image: "food_19.png" },
+  { name: "Sliced Cake", description: "Food provides essential nutrients for overall health and well-being", price: 15, category: "Cake", image: "food_20.png" },
+  { name: "Garlic Mushroom", description: "Food provides essential nutrients for overall health and well-being", price: 14, category: "Pure Veg", image: "food_21.png" },
+  { name: "Fried Cauliflower", description: "Food provides essential nutrients for overall health and well-being", price: 22, category: "Pure Veg", image: "food_22.png" },
+  { name: "Mix Veg Pulao", description: "Food provides essential nutrients for overall health and well-being", price: 10, category: "Pure Veg", image: "food_23.png" },
+  { name: "Cheese Pasta", description: "Food provides essential nutrients for overall health and well-being", price: 12, category: "Pasta", image: "food_25.png" },
+  { name: "Tomato Pasta", description: "Food provides essential nutrients for overall health and well-being", price: 18, category: "Pasta", image: "food_26.png" },
+  { name: "Creamy Pasta", description: "Food provides essential nutrients for overall health and well-being", price: 16, category: "Pasta", image: "food_27.png" },
+  { name: "Buttter Noodles", description: "Food provides essential nutrients for overall health and well-being", price: 14, category: "Noodles", image: "food_29.png" },
+  { name: "Veg Noodles", description: "Food provides essential nutrients for overall health and well-being", price: 12, category: "Noodles", image: "food_30.png" },
+  { name: "Somen Noodles", description: "Food provides essential nutrients for overall health and well-being", price: 20, category: "Noodles", image: "food_31.png" },
+  { name: "Cooked Noodles", description: "Food provides essential nutrients for overall health and well-being", price: 15, category: "Noodles", image: "food_32.png" },
+];
+
+async function seedDefaultFoods() {
+  try {
+    const count = await foodModel.countDocuments();
+
+    if (count > 0) {
+      return;
+    }
+
+    await foodModel.insertMany(defaultFoods);
+    console.log("Default food items inserted successfully");
+  } catch (error) {
+    console.error("Failed to seed default foods:", error);
+  }
+}
 
 app.get("/", (req, res) => {
   res.send("API Working");
 });
 
 connectDB()
-  .then(() => {
+  .then(async () => {
+    await seedDefaultFoods();
     app.listen(port, () => {
       console.log(`Server Started on http://localhost:${port}`);
     });

@@ -32,6 +32,32 @@ const listFood = async (req, res) =>{
     }
 }
 
+// search food item
+const searchFood = async (req, res) => {
+    try {
+        const query = (req.query.q || "").trim();
+
+        if (!query) {
+            return res.json({ success: true, data: [] });
+        }
+
+        const searchRegex = new RegExp(query, "i");
+
+        const foods = await foodModel.find({
+            $or: [
+                { name: { $regex: searchRegex } },
+                { description: { $regex: searchRegex } },
+                { category: { $regex: searchRegex } }
+            ]
+        });
+
+        res.json({ success: true, data: foods });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error" });
+    }
+}
+
 // Remove food item
 const removeFood = async (req, res) => {
     try{
@@ -47,4 +73,4 @@ const removeFood = async (req, res) => {
         }
     }
 
-export {addFood, listFood, removeFood}
+export {addFood, listFood, searchFood, removeFood}
