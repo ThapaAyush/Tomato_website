@@ -97,3 +97,41 @@
     justify-self: start;
   }
 }
+
+@media (max-width: 420px) {
+  .orders-page {
+    margin-top: 20px;
+    padding: 0 12px;
+  }
+
+  .orders-title {
+    margin-bottom: 18px;
+    font-size: 2rem;
+  }
+
+  .order-card {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px 12px;
+  }
+
+  .order-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 1.4rem;
+  }
+
+  .order-items {
+    font-size: 0.95rem;
+  }
+
+  .order-meta {
+    gap: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .track-order-btn {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+  }
+}

@@ -37,9 +37,9 @@ const cart = () => {
               >
                 <img src={imageUrl} alt={item.name} />
                 <p>{item.name}</p>
-                <p>${item.price}</p>
-                <p>{cartItems[item._id]}</p>
-                <p>${item.price * cartItems[item._id]}</p>
+                <p><span className='cart-mobile-label'>Price: </span>${item.price}</p>
+                <p><span className='cart-mobile-label'>Quantity: </span>{cartItems[item._id]}</p>
+                <p><span className='cart-mobile-label'>Total: </span>${item.price * cartItems[item._id]}</p>
                 <p onClick={() => removeFromCart(item._id)}>x</p>
               </div>
             )

@@ -9,7 +9,7 @@
 }
 .expore-menu-text{
     max-width: 60%;
-    columns: #808080;
+    color: #808080;
 }
 .expore-menu-list{
     display: flex;
@@ -29,6 +29,9 @@
     cursor: pointer;
     border-radius: 50%;
     transition: 0.2s;
+}
+.expore-menu-list-item{
+    flex: 0 0 auto;
 }
 .expore-menu-list-item p{
     margin-top: 10px;
@@ -70,5 +73,22 @@
     }
     .expore-menu-list-item p{
         font-size: 14px;
+    }
+}
+
+@media (max-width: 420px){
+    .explore-menu h1{
+        font-size: 24px;
+    }
+    .expore-menu-list{
+        gap: 16px;
+        padding: 2px 0 6px;
+    }
+    .expore-menu-list-item img{
+        width: 64px;
+        min-width: 64px;
+    }
+    .expore-menu-list-item p{
+        font-size: 13px;
     }
 }
