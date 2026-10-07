@@ -10,6 +10,7 @@ import PlaceOrder from './pages/PlaceOrder/PlaceOrder'
 import Orders from './pages/Orders/Orders'
 import Footer from './components/Footer/Footer'
 import LoginPopup from './components/LoginPopup/LoginPopup'
+import AiAssistant from './components/AiAssistant/AiAssistant'
 
 const App = () => {
 
@@ -24,6 +25,7 @@ const App = () => {
 
         <Routes>
           <Route path='/' element={<Home />} />
+          <Route path='/home' element={<Home />} />
           <Route path='/cart' element={<Cart />} />
           <Route path='/order' element={<PlaceOrder />} />
           <Route path='/orders' element={<Orders />} />
@@ -31,6 +33,7 @@ const App = () => {
 
       </div>
       <Footer />
+      <AiAssistant setShowLogin={setShowLogin} />
     </>
   )
 }

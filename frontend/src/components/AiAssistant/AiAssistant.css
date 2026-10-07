@@ -1,0 +1,775 @@
+/* ==========================================================================
+   AI FOOD ASSISTANT WIDGET & MASCOT STYLES
+   ========================================================================== */
+
+/* Outer Floating Container */
+.ai-assistant-wrapper {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    pointer-events: none;
+}
+
+.ai-assistant-wrapper * {
+    box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   1. Floating Robot Mascot Launcher (Reference Image 1)
+   -------------------------------------------------------------------------- */
+.ai-mascot-launcher {
+    pointer-events: auto;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    outline: none;
+}
+
+.ai-mascot-launcher:hover {
+    transform: translateY(-6px) scale(1.04);
+}
+
+.ai-mascot-launcher:active {
+    transform: translateY(0) scale(0.96);
+}
+
+}
+
+/* Robot 3D Figure Wrap */
+.ai-robot-figure-wrap {
+    position: relative;
+    width: 90px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.ai-robot-mascot-img {
+    width: 86px;
+    height: 86px;
+    object-fit: contain;
+    animation: robotFloat 3.6s ease-in-out infinite;
+    filter: drop-shadow(0 8px 18px rgba(235, 90, 27, 0.42));
+    transition: transform 0.3s ease;
+}
+
+.ai-mascot-launcher:hover .ai-robot-mascot-img {
+    animation-duration: 1.8s;
+}
+
+@keyframes robotFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(2deg);
+    }
+}
+
+/* Soft Ground Shadow */
+.ai-robot-shadow {
+    width: 55px;
+    height: 10px;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0) 75%);
+    border-radius: 50%;
+    margin-top: -6px;
+    animation: shadowPulse 3.6s ease-in-out infinite;
+}
+
+@keyframes shadowPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(0.7);
+        opacity: 0.4;
+    }
+}
+
+
+
+/* --------------------------------------------------------------------------
+   2. Food Assistant Popup Window (Reference Image 2)
+   -------------------------------------------------------------------------- */
+.ai-assistant-card {
+    pointer-events: auto;
+    width: 385px;
+    max-width: calc(100vw - 32px);
+    height: 590px;
+    max-height: calc(100vh - 80px);
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16), 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: cardEntrance 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: bottom right;
+}
+
+@keyframes cardEntrance {
+    0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Header */
+.ai-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: linear-gradient(180deg, #fff9f8 0%, #ffffff 100%);
+    border-bottom: 1px solid #f2e9e6;
+}
+
+.ai-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-header-avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff0eb;
+    border: 2px solid #ffd8cd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+}
+
+.ai-header-avatar img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.ai-online-indicator {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #22c55e;
+    border: 2px solid #ffffff;
+}
+
+.ai-header-titles {
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-header-name {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #2e2640;
+    letter-spacing: -0.2px;
+}
+
+.ai-header-subtitle {
+    margin: 2px 0 0 0;
+    font-size: 12px;
+    color: #8c889f;
+}
+
+.ai-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ai-icon-btn,
+.ai-close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    transition: background 0.2s, color 0.2s;
+}
+
+.ai-icon-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+}
+
+.ai-icon-btn:hover {
+    background: #f1f5f9;
+}
+
+.ai-close-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.ai-close-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+/* Chat Messages Body */
+.ai-messages-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 16px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #fafafb;
+    scroll-behavior: smooth;
+}
+
+.ai-messages-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+.ai-messages-body::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+/* Message Rows */
+.ai-message-row {
+    display: flex;
+    gap: 10px;
+    max-width: 100%;
+}
+
+.ai-message-row.user-row {
+    justify-content: flex-end;
+}
+
+.ai-message-row.assistant-row {
+    justify-content: flex-start;
+}
+
+.ai-bubble-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #fff1ed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 4px;
+    border: 1px solid #ffd4c7;
+}
+
+.ai-bubble-avatar img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.ai-bubble-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 84%;
+}
+
+/* Chat Bubbles */
+.ai-chat-bubble {
+    padding: 11px 14px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    position: relative;
+    word-break: break-word;
+}
+
+.ai-chat-bubble.ai-bubble {
+    background: #f8f6f5;
+    color: #2b2b2b;
+    border-radius: 16px 16px 16px 4px;
+    border: 1px solid #ebe5e3;
+}
+
+.ai-chat-bubble.user-bubble {
+    background: #ff4c24;
+    color: #ffffff;
+    border-radius: 16px 16px 4px 16px;
+    margin-left: auto;
+    box-shadow: 0 4px 12px rgba(255, 76, 36, 0.25);
+}
+
+.ai-bubble-text {
+    margin: 0;
+    white-space: pre-line;
+}
+
+.ai-bubble-timestamp {
+    display: block;
+    font-size: 10px;
+    margin-top: 4px;
+    opacity: 0.65;
+    text-align: right;
+}
+
+/* Typing Indicator */
+.ai-typing-indicator {
+    background: #f8f6f5;
+    border: 1px solid #ebe5e3;
+    border-radius: 16px 16px 16px 4px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: fit-content;
+}
+
+.ai-typing-indicator .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ff6b4a;
+    animation: typingPulse 1.4s infinite ease-in-out;
+}
+
+.ai-typing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingPulse {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* Action Button */
+.ai-special-action {
+    margin-top: 4px;
+}
+
+.ai-action-primary-btn {
+    background: #ff4c24;
+    color: #ffffff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.ai-action-primary-btn:hover {
+    background: #e03a15;
+    transform: translateY(-1px);
+}
+
+/* Order Summary Card */
+.ai-order-summary-card {
+    background: #ffffff;
+    border: 1px solid #ffdfd6;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ai-order-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.ai-status-tag {
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+
+.ai-view-orders-btn {
+    background: #fff1ed;
+    color: #ff4c24;
+    border: 1px solid #ffcbbe;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+}
+
+.ai-view-orders-btn:hover {
+    background: #ff4c24;
+    color: #ffffff;
+}
+
+/* Food Result Cards Grid */
+.ai-food-cards-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.ai-food-result-card {
+    display: flex;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #f0e8e6;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ai-food-result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.ai-card-img-wrap {
+    position: relative;
+    width: 85px;
+    min-height: 85px;
+    flex-shrink: 0;
+    background: #f8f8f8;
+}
+
+.ai-card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ai-category-badge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    background: rgba(0, 0, 0, 0.65);
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+}
+
+.ai-card-info {
+    flex: 1;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ai-card-title {
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.25;
+}
+
+.ai-card-desc {
+    margin: 3px 0;
+    font-size: 11px;
+    color: #64748b;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.ai-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.ai-card-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ff4c24;
+}
+
+.ai-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ai-add-cart-btn {
+    background: #ff4c24;
+    border: none;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 2px 6px rgba(255, 76, 36, 0.25);
+}
+
+.ai-add-cart-btn:hover {
+    background: #e03a15;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(255, 76, 36, 0.35);
+}
+
+.ai-food-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 8px;
+    border-radius: 50px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    user-select: none;
+}
+
+.ai-food-counter img {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    display: block;
+}
+
+.ai-food-counter img:hover {
+    transform: scale(1.12);
+}
+
+.ai-food-counter img:active {
+    transform: scale(0.92);
+}
+
+.ai-food-counter p {
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #0f172a;
+    min-width: 14px;
+    text-align: center;
+    line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   3. Quick Suggestion Pills Bar (Reference Image 2)
+   -------------------------------------------------------------------------- */
+.ai-pills-bar {
+    padding: 8px 14px 4px 14px;
+    background: #ffffff;
+    border-top: 1px solid #f1f1f4;
+}
+
+.ai-pills-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: #ffd0c7 transparent;
+}
+
+.ai-pills-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+
+.ai-pills-scroll::-webkit-scrollbar-thumb {
+    background: #ffd0c7;
+    border-radius: 4px;
+}
+
+.ai-pill-btn {
+    flex-shrink: 0;
+    background: #fff8f7;
+    border: 1px solid #ffd6ce;
+    color: #e23744;
+    padding: 6px 13px;
+    border-radius: 18px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.ai-pill-btn:hover {
+    background: #ff4c24;
+    color: #ffffff;
+    border-color: #ff4c24;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(255, 76, 36, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   4. Footer Input & Bottom Controls (Reference Image 2)
+   -------------------------------------------------------------------------- */
+.ai-card-footer-controls {
+    padding: 8px 14px 12px 14px;
+    background: #ffffff;
+    border-top: 1px solid #f3f3f6;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ai-input-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-input-box-wrap {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ai-text-input {
+    width: 100%;
+    padding: 9px 36px 9px 13px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 13px;
+    outline: none;
+    color: #1e293b;
+    background: #fdfdfd;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ai-text-input:focus {
+    border-color: #ff4c24;
+    box-shadow: 0 0 0 3px rgba(255, 76, 36, 0.12);
+    background: #ffffff;
+}
+
+.ai-mic-btn {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 2px;
+    opacity: 0.7;
+    transition: 0.2s;
+}
+
+.ai-mic-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.ai-mic-btn.listening {
+    opacity: 1;
+    animation: micPulse 1s infinite alternate;
+}
+
+@keyframes micPulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 4px #ef4444); }
+    100% { transform: scale(1.25); filter: drop-shadow(0 0 8px #ef4444); }
+}
+
+.ai-send-btn {
+    background: #ea4535;
+    color: #ffffff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 3px 8px rgba(234, 69, 53, 0.3);
+}
+
+.ai-send-btn:hover {
+    background: #d93828;
+    transform: translateY(-1px);
+}
+
+.ai-send-btn:active {
+    transform: translateY(0);
+}
+
+/* Bottom Close Pill (Reference Image 2) */
+.ai-bottom-close-wrap {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.ai-bottom-close-pill {
+    background: #ea4535;
+    color: #ffffff;
+    border: none;
+    padding: 6px 18px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 2px 6px rgba(234, 69, 53, 0.25);
+}
+
+.ai-bottom-close-pill:hover {
+    background: #d93828;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Responsiveness
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+    .ai-assistant-wrapper {
+        bottom: 16px;
+        right: 16px;
+    }
+
+    .ai-robot-figure-wrap {
+        width: 75px;
+        height: 85px;
+    }
+
+    .ai-robot-mascot-img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .ai-assistant-card {
+        width: calc(100vw - 24px);
+        height: 540px;
+        bottom: 8px;
+        right: 0;
+        border-radius: 20px;
+    }
+}

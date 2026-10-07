@@ -6,6 +6,11 @@
     transition: 0.3s;
     animation: fadeIn 1s;
 }
+.food-item.ai-highlighted {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 0 0 3px #ff4c24, 0 12px 25px rgba(255, 76, 36, 0.35);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 .food-item-image{
     width: 100%;
     border-radius: 15px 15px 0px 0px;

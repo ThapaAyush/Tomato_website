@@ -9,7 +9,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
     const {cartItems, addToCart, removeFromCart,url} = useContext(StoreContext);
     const imageUrl = image.startsWith("/") ? image : `${url}/images/${image}`;
     return (
-        <div className='food-item'>
+        <div className='food-item' id={`food-item-${id}`}>
             <div className="food-item-img-container">
                 <img className='food-item-image' src={imageUrl} alt={name} />
                 {!cartItems[id]

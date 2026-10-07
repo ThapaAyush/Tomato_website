@@ -38,7 +38,7 @@ const Navbar = ({ setShowLogin }) => {
     try {
       const response = await axios.get(`${url}/api/food/search`, { params: { q: query } });
       setSearchResults(response.data?.data || []);
-    } catch (error) {
+    } catch (_error) {
       const filtered = food_list.filter((item) =>
         `${item.name} ${item.description} ${item.category}`
           .toLowerCase()
