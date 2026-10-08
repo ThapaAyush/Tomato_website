@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Navbar from './components/Navbar/Navbar'
 
@@ -14,7 +14,26 @@ import AiAssistant from './components/AiAssistant/AiAssistant'
 
 const App = () => {
 
-  const [showLogin, setShowLogin] = useState(false)
+  const [showLogin, setShowLogin] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("login") === "true" || params.get("signin") === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("login") === "true" || params.get("signin") === "true") {
+        setShowLogin(true);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
 
   return (
     <>
@@ -27,8 +46,8 @@ const App = () => {
           <Route path='/' element={<Home />} />
           <Route path='/home' element={<Home />} />
           <Route path='/cart' element={<Cart />} />
-          <Route path='/order' element={<PlaceOrder />} />
-          <Route path='/orders' element={<Orders />} />
+          <Route path='/order' element={<PlaceOrder setShowLogin={setShowLogin} />} />
+          <Route path='/orders' element={<Orders setShowLogin={setShowLogin} />} />
         </Routes>
 
       </div>

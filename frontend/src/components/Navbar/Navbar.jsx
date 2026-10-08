@@ -16,14 +16,15 @@ const Navbar = ({ setShowLogin }) => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
-  const { getTotalCartAmount, token, setToken, food_list, addToCart, url } = useContext(StoreContext);
+  const { getTotalCartAmount, token, setToken, food_list, addToCart, url, role, setRole } = useContext(StoreContext);
   const navigate = useNavigate();
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("role");
     setToken("");
+    if (setRole) setRole("Customer");
     navigate("/");
-
   }
 
   const handleSearch = async (value) => {
@@ -118,23 +119,39 @@ const Navbar = ({ setShowLogin }) => {
 
           <div className='navbar-profile'>
 
-            <img src={assets.profile_icon} alt="" />
+            <img src={assets.profile_icon} className='navbar-profile-avatar' alt="Account" />
 
-            <ul className='nav-profile-dropdown'>
+            <div className='nav-profile-dropdown'>
+              <div className='nav-profile-header'>
+                <span className='nav-profile-role-badge'>
+                  Customer
+                </span>
+              </div>
 
-              <li onClick={() => navigate('/orders')}>
-                <img src={assets.bag_icon} alt="" />
-                <p>Orders</p>
-              </li>
+              <ul className='nav-profile-list'>
+                <li onClick={() => navigate('/orders')} className='nav-profile-item'>
+                  <div className='nav-profile-icon-wrap orders-icon'>
+                    <img src={assets.bag_icon} alt="" />
+                  </div>
+                  <div className='nav-profile-item-text'>
+                    <p className='nav-profile-item-title'>Orders</p>
+                    <span className='nav-profile-item-sub'>Track current orders</span>
+                  </div>
+                </li>
 
-              <hr />
+                <div className='nav-profile-divider' />
 
-              <li onClick={logout}>
-                <img src={assets.logout_icon} alt="" />
-                <p>Logout</p>
-              </li>
-
-            </ul>
+                <li onClick={logout} className='nav-profile-item logout-item'>
+                  <div className='nav-profile-icon-wrap logout-icon'>
+                    <img src={assets.logout_icon} alt="" />
+                  </div>
+                  <div className='nav-profile-item-text'>
+                    <p className='nav-profile-item-title'>Logout</p>
+                    <span className='nav-profile-item-sub'>Sign out securely</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
 
           </div>
 
@@ -170,7 +187,7 @@ const Navbar = ({ setShowLogin }) => {
                         <h4>{item.name}</h4>
                         <p>{item.description}</p>
                         <div className='search-item-footer'>
-                          <span>${item.price}</span>
+                          <span>₹{item.price}</span>
                           <button type='button' onClick={() => addToCart(item._id)}>Add</button>
                         </div>
                       </div>

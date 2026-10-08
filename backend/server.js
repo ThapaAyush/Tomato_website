@@ -1,30 +1,67 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 import { connectDB } from "./config/db.js";
 import foodRouter from "./routes/foodRoutes.js";
 import userRouter from "./routes/userRoutes.js";
-import 'dotenv/config'
 import cartRouter from "./routes/cartRoutes.js";
 import orderRouter from "./routes/orderRoute.js";
 import foodModel from "./models/foodModel.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.join(__dirname, "uploads");
+
+// Ensure uploads directory exists on any host
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // app config
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 
+// CORS configuration (supports Render, Vercel, localhost)
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((origin) => origin.trim())
+  : "*";
 
+app.use(
+  cors({
+    origin: allowedOrigins === "*" ? "*" : allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "token", "Authorization"],
+  })
+);
 
 // middleware
 app.use(express.json());
-app.use(cors());
+
+// static file serving using absolute directory
+app.use("/images", express.static(uploadsDir));
+
+// health check endpoint for Render monitoring
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// root endpoint
+app.get("/", (req, res) => {
+  res.status(200).send("Food Delivery API is running");
+});
 
 // api endpoints
-app.use("/api/food",foodRouter)
-app.use("/images",express.static('uploads'))
-app.use("/api/user",userRouter)
-app.use("/api/cart",cartRouter)
-app.use("/api/order",orderRouter)
+app.use("/api/food", foodRouter);
+app.use("/api/user", userRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/order", orderRouter);
 
 const defaultFoods = [
   { name: "Greek salad", description: "Food provides essential nutrients for overall health and well-being", price: 12, category: "Salad", image: "food_1.png" },
@@ -53,7 +90,7 @@ const defaultFoods = [
   { name: "Creamy Pasta", description: "Food provides essential nutrients for overall health and well-being", price: 16, category: "Pasta", image: "food_27.png" },
   { name: "Buttter Noodles", description: "Food provides essential nutrients for overall health and well-being", price: 14, category: "Noodles", image: "food_29.png" },
   { name: "Veg Noodles", description: "Food provides essential nutrients for overall health and well-being", price: 12, category: "Noodles", image: "food_30.png" },
-  { name: "Somen Noodles", description: "Food provides essential nutrients for overall health and well-being", price: 20, category: "Noodles", image: "food_31.png" },
+  { name: "Somen Noodles", description: "Food border essential nutrients for overall health and well-being", price: 20, category: "Noodles", image: "food_31.png" },
   { name: "Cooked Noodles", description: "Food provides essential nutrients for overall health and well-being", price: 15, category: "Noodles", image: "food_32.png" },
 ];
 
@@ -72,19 +109,39 @@ async function seedDefaultFoods() {
   }
 }
 
-app.get("/", (req, res) => {
-  res.send("API Working");
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error("Server Error:", err.stack || err);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
 });
+
+let server;
 
 connectDB()
   .then(async () => {
     await seedDefaultFoods();
-    app.listen(port, () => {
-      console.log(`Server Started on http://localhost:${port}`);
+    server = app.listen(port, "0.0.0.0", () => {
+      console.log(`Server Started on port ${port} (http://0.0.0.0:${port})`);
     });
   })
-  .catch(() => {
-    console.error("Database connection failed. Check MONGODB_URI and Atlas network access.");
+  .catch((err) => {
+    console.error("Database connection failed. Ensure MONGODB_URI is set in Render environment variables and Atlas Network Access allows 0.0.0.0/0.", err);
     process.exit(1);
   });
+
+// Graceful shutdown handling for Render
+process.on("SIGTERM", () => {
+  console.log("SIGTERM signal received. Closing HTTP server...");
+  if (server) {
+    server.close(() => {
+      console.log("HTTP server closed.");
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+});
 

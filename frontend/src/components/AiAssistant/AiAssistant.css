@@ -39,8 +39,6 @@
     transform: translateY(0) scale(0.96);
 }
 
-}
-
 /* Robot 3D Figure Wrap */
 .ai-robot-figure-wrap {
     position: relative;

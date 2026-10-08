@@ -1,0 +1,207 @@
+.admin-auth-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  padding: 24px;
+  box-sizing: border-box;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.admin-auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 36px 32px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+  animation: authFadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes authFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.admin-auth-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.admin-auth-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.admin-auth-logo {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+
+.admin-auth-badge {
+  display: inline-block;
+  background: #fff1ed;
+  color: #ff5722;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 87, 34, 0.25);
+}
+
+.admin-auth-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.admin-auth-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.admin-auth-security-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #ff5722;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #475569;
+  font-weight: 500;
+  margin-bottom: 22px;
+}
+
+.admin-auth-security-notice svg {
+  color: #ff5722;
+  flex-shrink: 0;
+}
+
+.admin-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.admin-form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.admin-form-group input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.admin-form-group input:focus {
+  border-color: #ff5722;
+  box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.15);
+}
+
+.admin-form-group input::placeholder {
+  color: #94a3b8;
+}
+
+.admin-auth-submit-btn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ff5722 0%, #f4511e 100%);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 8px 20px -4px rgba(255, 87, 34, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-auth-submit-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px -4px rgba(255, 87, 34, 0.45);
+  background: linear-gradient(135deg, #f4511e 0%, #e64a19 100%);
+}
+
+.admin-auth-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.admin-auth-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.admin-auth-footer {
+  text-align: center;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #f1f5f9;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.admin-auth-footer p {
+  margin: 0;
+}
+
+.admin-auth-switch-btn {
+  background: none;
+  border: none;
+  color: #ff5722;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: inherit;
+  font-family: inherit;
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+
+.admin-auth-switch-btn:hover {
+  color: #d84315;
+}

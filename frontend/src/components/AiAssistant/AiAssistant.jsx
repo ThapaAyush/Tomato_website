@@ -12,7 +12,7 @@ const AiAssistant = ({ setShowLogin }) => {
         cartItems = {},
         addToCart = () => {},
         removeFromCart = () => {},
-        url = 'http://localhost:4000',
+        url = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000',
         token = ''
     } = context;
     const navigate = useNavigate();
@@ -341,7 +341,7 @@ const AiAssistant = ({ setShowLogin }) => {
             } else if (q.includes('sweet') || q.includes('dessert') || q.includes('cake')) {
                 intro = `Craving something sweet? Here are irresistible treats: 🍰`;
             } else if (maxPrice !== null) {
-                intro = `Great vegetarian picks matching your budget (under $${maxPrice}): 💰`;
+                intro = `Great vegetarian picks matching your budget (under ₹${maxPrice}): 💰`;
             }
             return {
                 text: intro,
@@ -543,7 +543,7 @@ const AiAssistant = ({ setShowLogin }) => {
                                                             <h3 className="ai-card-title">{item.name}</h3>
                                                             <p className="ai-card-desc">{item.description}</p>
                                                             <div className="ai-card-footer">
-                                                                <span className="ai-card-price">${item.price}</span>
+                                                                <span className="ai-card-price">₹{item.price}</span>
                                                                 <div className="ai-card-actions">
                                                                     {inCart === 0 ? (
                                                                         <button
@@ -622,7 +622,7 @@ const AiAssistant = ({ setShowLogin }) => {
                                     className="ai-text-input"
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Ask for pasta, rolls, salads, cakes under $15..."
+                                    placeholder="Ask for pasta, rolls, salads, cakes under ₹150..."
                                 />
                                 {speechSupported && (
                                     <button

@@ -19,9 +19,16 @@ const StoreContextProvider = (props) => {
             return {};
         }
     });
-    const url = "http://localhost:4000";
-    const [token, setToken] = useState("");
+    const url = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+    const [token, setToken] = useState(() => localStorage.getItem("token") || "");
     const [food_list, setFoodList] = useState(sampleFoodList)
+
+    const [role, setRole] = useState(() => localStorage.getItem("role") || "Customer");
+
+    const clearCart = () => {
+        setCartItems({});
+        localStorage.removeItem(storageKey);
+    };
 
     const addToCart = async (itemId) => {
         setCartItems((prev) => ({
@@ -97,12 +104,15 @@ const StoreContextProvider = (props) => {
 
     useEffect(() => {
         async function localData() {
-            await fetchFoodList();
-            if (localStorage.getItem("token")) {
-                const savedToken = localStorage.getItem("token");
+            const savedToken = localStorage.getItem("token");
+            if (savedToken) {
                 setToken(savedToken);
-                await loadCartData(savedToken)
+                await loadCartData(savedToken);
             }
+            if (localStorage.getItem("role")) {
+                setRole(localStorage.getItem("role"));
+            }
+            await fetchFoodList();
         }
         localData();
     }, [])
@@ -115,12 +125,15 @@ const StoreContextProvider = (props) => {
         food_list,
         cartItems,
         setCartItems,
+        clearCart,
         addToCart,
         removeFromCart,
         getTotalCartAmount,
         url,
         token,
         setToken,
+        role,
+        setRole,
     }
     return (
         <StoreContext.Provider value={contextValue}>

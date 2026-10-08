@@ -37,9 +37,9 @@ const cart = () => {
               >
                 <img src={imageUrl} alt={item.name} />
                 <p>{item.name}</p>
-                <p><span className='cart-mobile-label'>Price: </span>${item.price}</p>
+                <p><span className='cart-mobile-label'>Price: </span>₹{item.price}</p>
                 <p><span className='cart-mobile-label'>Quantity: </span>{cartItems[item._id]}</p>
-                <p><span className='cart-mobile-label'>Total: </span>${item.price * cartItems[item._id]}</p>
+                <p><span className='cart-mobile-label'>Total: </span>₹{item.price * cartItems[item._id]}</p>
                 <p onClick={() => removeFromCart(item._id)}>x</p>
               </div>
             )
@@ -52,15 +52,15 @@ const cart = () => {
           <div>
             <div className='cart-total-details'>
               <p>Subtotal</p>
-              <p>${totalAmount}</p>
+              <p>₹{totalAmount}</p>
             </div>
             <div className='cart-total-details'>
               <p>Delivery Fee</p>
-              <p>${isCartEmpty ? 0 : 2}</p>
+              <p>₹{isCartEmpty ? 0 : 2}</p>
             </div>
             <div className='cart-total-details'>
               <b>Total</b>
-              <b>${isCartEmpty ? 0 : totalAmount + 2}</b>
+              <b>₹{isCartEmpty ? 0 : totalAmount + 2}</b>
             </div>
 
           </div>

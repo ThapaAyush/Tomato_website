@@ -4,16 +4,20 @@ import "./PlaceOrder.css";
 import { StoreContext } from "../../context/StoreContext";
 import { useNavigate } from "react-router-dom";
 
-const PlaceOrder = () => {
+const PlaceOrder = ({ setShowLogin }) => {
   const {
     getTotalCartAmount,
     token,
     food_list,
     cartItems,
+    setCartItems,
+    clearCart,
     url,
   } = useContext(StoreContext);
 
   const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cod");
 
   const [data, setData] = useState({
     firstName: "",
@@ -29,9 +33,7 @@ const PlaceOrder = () => {
 
   // Handle input changes
   const onChangeHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-
+    const { name, value } = event.target;
     setData((prev) => ({
       ...prev,
       [name]: value,
@@ -41,19 +43,16 @@ const PlaceOrder = () => {
   // Load Razorpay checkout script
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
-      // If Razorpay is already loaded
       if (window.Razorpay) {
         resolve(true);
         return;
       }
 
       const script = document.createElement("script");
-
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.async = true;
 
       script.onload = () => {
-        console.log("Razorpay script loaded successfully");
         resolve(true);
       };
 
@@ -66,22 +65,39 @@ const PlaceOrder = () => {
     });
   };
 
+  const finalizeOrderSuccess = (message = "Order placed successfully!") => {
+    if (typeof clearCart === "function") {
+      clearCart();
+    } else if (typeof setCartItems === "function") {
+      setCartItems({});
+    }
+    try {
+      localStorage.removeItem("food-del-cart");
+    } catch (e) {
+      console.warn("Could not clear saved cart:", e);
+    }
+    alert(message);
+    navigate("/orders");
+  };
+
   // Place order
   const placeOrder = async (event) => {
     event.preventDefault();
 
-    console.log("Proceed to payment clicked");
+    const activeToken = token || localStorage.getItem("token");
 
-    const totalAmount = getTotalCartAmount();
-
-    if (!token) {
+    if (!activeToken) {
       alert("Please login first to continue with checkout");
+      if (setShowLogin) setShowLogin(true);
       return;
     }
+
+    const totalAmount = getTotalCartAmount();
 
     // Check cart
     if (totalAmount === 0) {
       alert("Your cart is empty");
+      navigate("/cart");
       return;
     }
 
@@ -93,240 +109,120 @@ const PlaceOrder = () => {
         quantity: cartItems[item._id],
       }));
 
-    console.log("Order items:", orderItems);
-    console.log("Cart total:", totalAmount);
-    console.log("Token:", token);
-
     if (orderItems.length === 0) {
       alert("Your cart is empty");
+      navigate("/cart");
       return;
     }
 
     try {
-      // ============================================
-      // STEP 1: CREATE ORDER ON BACKEND
-      // ============================================
+      setSubmitting(true);
+
+      const orderPayload = {
+        address: data,
+        items: orderItems,
+        amount: totalAmount + 2,
+        paymentMethod: paymentMethod,
+      };
 
       const response = await axios.post(
         `${url}/api/order/place`,
-        {
-          address: data,
-          items: orderItems,
-          amount: totalAmount + 2,
-        },
+        orderPayload,
         {
           headers: {
-            token: token,
+            token: activeToken,
           },
         }
       );
 
-      console.log("Backend response:", response.data);
-
       // Check backend response
-      if (!response.data.success) {
-        alert(
-          response.data.message || "Unable to create order"
-        );
+      if (!response.data?.success) {
+        alert(response.data?.message || "Unable to create order. Please try again.");
+        setSubmitting(false);
         return;
       }
 
-      // ============================================
-      // STEP 2: LOAD RAZORPAY
-      // ============================================
+      // If Cash on Delivery or fallback
+      if (paymentMethod === "cod" || response.data?.paymentMethod === "cod") {
+        finalizeOrderSuccess(response.data?.message || "Order placed successfully with Cash on Delivery!");
+        return;
+      }
 
+      // Razorpay Online Payment Flow
       const razorpayLoaded = await loadRazorpayScript();
 
       if (!razorpayLoaded) {
-        alert(
-          "Razorpay checkout failed to load. Please check your internet connection."
-        );
+        alert("Payment gateway script could not be loaded. Your order was placed as Cash on Delivery.");
+        finalizeOrderSuccess("Order placed successfully with Cash on Delivery!");
         return;
       }
-
-      console.log("Razorpay loaded:", window.Razorpay);
-
-      // ============================================
-      // STEP 3: GET RAZORPAY ORDER DETAILS
-      // ============================================
 
       const { key, order } = response.data;
 
-      console.log("Razorpay key:", key);
-      console.log("Razorpay order:", order);
-
-      if (!key) {
-        alert("Razorpay key is missing from server response");
-        console.error("Missing Razorpay key:", response.data);
+      if (!key || !order || !order.id) {
+        // Safe fallback
+        finalizeOrderSuccess("Order placed successfully!");
         return;
       }
-
-      if (!order) {
-        alert("Razorpay order is missing from server response");
-        console.error("Missing Razorpay order:", response.data);
-        return;
-      }
-
-      if (!order.id) {
-        alert("Razorpay order ID is missing");
-        console.error("Missing order ID:", order);
-        return;
-      }
-
-      // ============================================
-      // STEP 4: RAZORPAY OPTIONS
-      // ============================================
 
       const options = {
         key: key,
-
         amount: order.amount,
-
         currency: order.currency || "INR",
-
         name: "Tomato.",
-
         description: "Food order payment",
-
         order_id: order.id,
-
-        // Payment successful
-        handler: function (paymentResponse) {
-          console.log(
-            "Payment successful:",
-            paymentResponse
-          );
-
-          alert("Payment successful!");
-
-          window.location.href = "/orders";
+        handler: function () {
+          finalizeOrderSuccess("Payment successful! Your order has been placed.");
         },
-
-        // Customer information
         prefill: {
-          name: `${data.firstName} ${data.lastName}`,
+          name: `${data.firstName} ${data.lastName}`.trim(),
           email: data.email,
           contact: data.phone,
         },
-
-        // Razorpay theme
         theme: {
           color: "#ff4d4d",
         },
-
-        // When payment popup is closed
         modal: {
           ondismiss: function () {
-            console.log(
-              "Razorpay payment window was closed"
-            );
+            alert("Payment window closed. You can track your order in My Orders.");
+            finalizeOrderSuccess("Order placed! Tracking available in My Orders.");
           },
         },
       };
 
-      // ============================================
-      // STEP 5: CREATE RAZORPAY INSTANCE
-      // ============================================
-
-      console.log("Creating Razorpay instance...");
-
       const razorpay = new window.Razorpay(options);
 
-      // Payment failed event
-      razorpay.on(
-        "payment.failed",
-        function (response) {
-          console.error(
-            "Payment failed:",
-            response.error
-          );
-
-          alert(
-            response.error.description ||
-              "Payment failed. Please try again."
-          );
-        }
-      );
-
-      // ============================================
-      // STEP 6: OPEN RAZORPAY
-      // ============================================
-
-      console.log("Opening Razorpay checkout...");
+      razorpay.on("payment.failed", function (failResponse) {
+        console.error("Payment failed:", failResponse.error);
+        alert(failResponse.error?.description || "Payment failed. Order saved for offline processing.");
+        finalizeOrderSuccess("Order created. Please pay cash upon arrival.");
+      });
 
       razorpay.open();
     } catch (error) {
-      console.error(
-        "Place order error:",
-        error
-      );
-
-      // Backend error
-      if (error.response) {
-        console.error(
-          "Backend response:",
-          error.response.data
-        );
-
-        alert(
-          error.response.data.message ||
-            "Server error while placing order"
-        );
-      }
-
-      // Request sent but no response
-      else if (error.request) {
-        console.error(
-          "No response received:",
-          error.request
-        );
-
-        alert(
-          "Cannot connect to server. Please make sure your backend is running."
-        );
-      }
-
-      // Other error
-      else {
-        alert(
-          "Unable to place order. Please try again."
-        );
-      }
+      console.error("Place order error:", error);
+      const errMsg = error.response?.data?.message || "Server error while placing order. Please try again.";
+      alert(errMsg);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  // ============================================
-  // CHECK LOGIN AND CART
-  // ============================================
-
+  // Redirect if cart is empty on mount
   useEffect(() => {
-    if (getTotalCartAmount() === 0) {
+    const total = getTotalCartAmount();
+    if (total === 0 && (!cartItems || Object.keys(cartItems).length === 0)) {
       navigate("/cart");
     }
-  }, [
-    getTotalCartAmount,
-    navigate,
-  ]);
-
-  // ============================================
-  // JSX
-  // ============================================
+  }, [getTotalCartAmount, cartItems, navigate]);
 
   return (
-    <form
-      className="place-order"
-      onSubmit={placeOrder}
-    >
-      {/* =========================================
-          LEFT SIDE - DELIVERY DETAILS
-      ========================================== */}
-
+    <form className="place-order" onSubmit={placeOrder}>
+      {/* LEFT SIDE - DELIVERY DETAILS */}
       <div className="place-order-left">
-        <h2 className="title">
-          Delivery Details
-        </h2>
+        <h2 className="title">Delivery Details</h2>
 
-        {/* First Name + Last Name */}
         <div className="multi-fields">
           <input
             type="text"
@@ -347,7 +243,6 @@ const PlaceOrder = () => {
           />
         </div>
 
-        {/* Email + Phone */}
         <div className="multi-fields">
           <input
             type="email"
@@ -368,7 +263,6 @@ const PlaceOrder = () => {
           />
         </div>
 
-        {/* Street */}
         <input
           type="text"
           name="street"
@@ -378,7 +272,6 @@ const PlaceOrder = () => {
           required
         />
 
-        {/* City + State */}
         <div className="multi-fields">
           <input
             type="text"
@@ -399,7 +292,6 @@ const PlaceOrder = () => {
           />
         </div>
 
-        {/* Zipcode + Country */}
         <div className="multi-fields">
           <input
             type="text"
@@ -421,51 +313,77 @@ const PlaceOrder = () => {
         </div>
       </div>
 
-      {/* =========================================
-          RIGHT SIDE - CART TOTAL
-      ========================================== */}
-
+      {/* RIGHT SIDE - CART TOTAL & PAYMENT */}
       <div className="place-order-right">
         <div className="cart-total">
           <h2>Cart Totals</h2>
 
           <div>
-            {/* Subtotal */}
             <div className="cart-total-details">
               <p>Subtotal</p>
-
-              <p>
-                ₹{getTotalCartAmount()}
-              </p>
+              <p>₹{getTotalCartAmount()}</p>
             </div>
 
-            {/* Delivery Fee */}
             <div className="cart-total-details">
               <p>Delivery Fee</p>
-
-              <p>
-                ₹{getTotalCartAmount() === 0 ? 0 : 2}
-              </p>
+              <p>₹{getTotalCartAmount() === 0 ? 0 : 2}</p>
             </div>
 
             <hr />
 
-            {/* Total */}
             <div className="cart-total-details">
               <b>Total</b>
-
-              <b>
-                ₹
-                {getTotalCartAmount() === 0
-                  ? 0
-                  : getTotalCartAmount() + 2}
-              </b>
+              <b>₹{getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</b>
             </div>
           </div>
 
-          {/* Payment button */}
-          <button type="submit">
-            PROCEED TO PAYMENT
+          {/* Payment Method Selector */}
+          <div className="payment-options-section">
+            <h3 className="payment-title">Payment Method</h3>
+            <div className="payment-methods-grid">
+              <label className={`payment-method-card ${paymentMethod === "cod" ? "selected" : ""}`}>
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="cod"
+                  checked={paymentMethod === "cod"}
+                  onChange={() => setPaymentMethod("cod")}
+                />
+                <div className="payment-method-content">
+                  <span className="payment-icon">💵</span>
+                  <div>
+                    <span className="payment-name">Cash on Delivery</span>
+                    <span className="payment-desc">Pay cash when food arrives</span>
+                  </div>
+                </div>
+              </label>
+
+              <label className={`payment-method-card ${paymentMethod === "razorpay" ? "selected" : ""}`}>
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="razorpay"
+                  checked={paymentMethod === "razorpay"}
+                  onChange={() => setPaymentMethod("razorpay")}
+                />
+                <div className="payment-method-content">
+                  <span className="payment-icon">💳</span>
+                  <div>
+                    <span className="payment-name">Online Payment</span>
+                    <span className="payment-desc">UPI, Cards, NetBanking (Razorpay)</span>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          {/* Submit button */}
+          <button type="submit" disabled={submitting}>
+            {submitting
+              ? "PROCESSING ORDER..."
+              : paymentMethod === "cod"
+              ? "PLACE ORDER (CASH ON DELIVERY)"
+              : "PROCEED TO ONLINE PAYMENT"}
           </button>
         </div>
       </div>

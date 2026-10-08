@@ -139,7 +139,7 @@ const Add = ({url}) => {
             <input
               type="number"
               name="price"
-              placeholder="$20"
+              placeholder="₹20"
               value={data.price}
               onChange={onChangeHandler}
               required
