@@ -336,8 +336,10 @@
 
 @media (max-width: 560px) {
   .place-order {
-    margin-top: 30px;
-    padding: 0 12px;
+    margin-top: 24px;
+    margin-bottom: 40px;
+    padding: 0 10px;
+    gap: 20px;
   }
 
   .place-order-left,
@@ -352,6 +354,56 @@
   }
 
   .title {
+    font-size: 1.85rem;
+    margin-bottom: 20px;
+  }
+
+  .custom-input-wrap input {
+    padding-right: 110px;
+  }
+
+  .switch-select-btn {
+    font-size: 0.72rem;
+    padding: 5px 8px;
+  }
+
+  .phone-code-box {
+    height: 48px;
+    min-width: 62px;
+    padding: 0 8px 0 10px;
+  }
+
+  .payment-method-card {
+    padding: 10px 12px;
+  }
+
+  .place-order-right .cart-total h2 {
     font-size: 2rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .place-order {
+    padding: 0 6px;
+  }
+
+  .place-order-left,
+  .place-order-right {
+    padding: 16px 12px;
+    border-radius: 16px;
+  }
+
+  .title {
+    font-size: 1.65rem;
+  }
+
+  .custom-input-wrap input {
+    padding-right: 95px;
+  }
+
+  .switch-select-btn {
+    font-size: 0.68rem;
+    padding: 4px 6px;
+    right: 6px;
   }
 }
