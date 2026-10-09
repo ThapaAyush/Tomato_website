@@ -318,18 +318,22 @@ const PlaceOrder = ({ setShowLogin }) => {
           />
 
           <div className="phone-input-container">
-            <select
-              className="phone-code-select"
-              value={countryCode}
-              onChange={(e) => setCountryCode(e.target.value)}
-              title="Select Country Calling Code"
-            >
-              {COUNTRY_PHONE_CODES.map((item) => (
-                <option key={item.code} value={item.code}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
+            <div className="phone-code-box" title="Click to change country calling code">
+              <span className="phone-code-display">{countryCode}</span>
+              <span className="phone-code-arrow">▾</span>
+              <select
+                className="phone-code-overlay-select"
+                value={countryCode}
+                onChange={(e) => setCountryCode(e.target.value)}
+                title="Select Country Calling Code"
+              >
+                {COUNTRY_PHONE_CODES.map((item) => (
+                  <option key={item.code} value={item.code}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </div>
             <input
               type="tel"
               name="phone"
