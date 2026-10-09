@@ -3,7 +3,8 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import crypto from "crypto";
-import razorpay from "razorpay"
+import razorpay from "razorpay";
+import { sendSignInEmail, sendSignUpEmail } from "../config/emailService.js";
 
 
 // login user
@@ -46,6 +47,13 @@ const loginUser = async (req, res) => {
         }
 
         const token = createToken(user._id);
+
+        // Send confirmation email asynchronously (non-blocking)
+        sendSignInEmail({
+            to: user.email,
+            name: user.name,
+            role: user.role || targetRole
+        }).catch((err) => console.error("Sign-in email error:", err.message));
 
         res.json({
             success: true,
@@ -126,6 +134,13 @@ const registerUser = async (req, res) => {
         }
 
         const token = createToken(user._id);
+
+        // Send welcome email asynchronously (non-blocking)
+        sendSignUpEmail({
+            to: user.email,
+            name: user.name,
+            role: user.role
+        }).catch((err) => console.error("Sign-up email error:", err.message));
 
         res.json({
             success: true,
