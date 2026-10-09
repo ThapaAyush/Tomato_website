@@ -339,7 +339,7 @@ const PlaceOrder = ({ setShowLogin }) => {
               name="phone"
               value={phoneDigits}
               onChange={(e) => setPhoneDigits(e.target.value.replace(/[^0-9]/g, ""))}
-              placeholder="Phone Number (e.g. 9812345678)"
+              placeholder="Phone Number"
               required
             />
           </div>
