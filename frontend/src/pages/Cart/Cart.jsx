@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import './Cart.css'
 import { StoreContext } from '../../context/StoreContext'
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +26,26 @@ const Cart = () => {
   const discount = getDiscountAmount();
   const finalTotal = isCartEmpty ? 0 : Math.max(0, totalAmount - discount) + 2;
 
+  // Clear any promo message if no item is added / cart is empty
+  useEffect(() => {
+    if (isCartEmpty) {
+      setPromoMsg({ text: '', type: '' });
+      if (promoCode) {
+        removePromoCode();
+      }
+    }
+  }, [isCartEmpty, promoCode, removePromoCode]);
+
+  // Auto-dismiss notification after 3.5 seconds
+  useEffect(() => {
+    if (promoMsg.text) {
+      const timer = setTimeout(() => {
+        setPromoMsg({ text: '', type: '' });
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [promoMsg]);
+
   const handlePromoSubmit = (e) => {
     e.preventDefault();
     if (isCartEmpty) {
@@ -48,7 +68,11 @@ const Cart = () => {
   const handleRemovePromo = () => {
     removePromoCode();
     setInputCode('');
-    setPromoMsg({ text: 'Promo code removed.', type: 'info' });
+    if (!isCartEmpty) {
+      setPromoMsg({ text: 'Promo code removed.', type: 'info' });
+    } else {
+      setPromoMsg({ text: '', type: '' });
+    }
   };
 
   return (
@@ -160,7 +184,7 @@ const Cart = () => {
               </form>
             )}
 
-            {promoMsg.text && (
+            {!isCartEmpty && promoMsg.text && (
               <div className={`promo-message ${promoMsg.type}`}>
                 {promoMsg.type === 'success' && '✅ '}
                 {promoMsg.type === 'error' && '❌ '}
