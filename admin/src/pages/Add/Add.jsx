@@ -4,10 +4,9 @@ import { assets } from "../../assets/assets";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const Add = ({url}) => {
-  
-
+const Add = ({ url }) => {
   const [image, setImage] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState({
     name: "",
@@ -18,9 +17,8 @@ const Add = ({url}) => {
 
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
-
-    setData((data) => ({
-      ...data,
+    setData((prevData) => ({
+      ...prevData,
       [name]: value,
     }));
   };
@@ -28,8 +26,13 @@ const Add = ({url}) => {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
-    const formData = new FormData();
+    if (!image) {
+      toast.error("Please upload an image for the food item.");
+      return;
+    }
 
+    setLoading(true);
+    const formData = new FormData();
     formData.append("name", data.name);
     formData.append("description", data.description);
     formData.append("price", Number(data.price));
@@ -52,105 +55,113 @@ const Add = ({url}) => {
       });
 
       setImage(false);
-      toast.success("Food added successfully!");
+      toast.success("Food item added successfully!");
     } catch (error) {
-      const message = error.response?.data?.message
-        || "Unable to reach the server. Make sure the backend is running.";
+      const message =
+        error.response?.data?.message ||
+        "Unable to reach the server. Make sure the backend is running.";
       toast.error(message);
+    } finally {
+      setLoading(false);
     }
-  }; 
+  };
 
   return (
-    <div className="add">
-      <form className="flex-col" onSubmit={onSubmitHandler}>
-        <div className="add-img-upload flex-col">
-          <p>Upload Image</p>
-
-          <label htmlFor="image">
-            <img
-              src={
-                image
-                  ? URL.createObjectURL(image)
-                  : assets.upload_area
-              }
-              alt=""
-            />
-          </label>
-
-          <input
-            type="file"
-            id="image"
-            hidden
-            required
-            onChange={(e) => setImage(e.target.files[0])}
-          />
+    <div className="add-page">
+      <div className="add-card">
+        <div className="add-card-header">
+          <h2>Add Food Item</h2>
+          <p>Upload image and fill details to add a new dish to the menu.</p>
         </div>
 
-        <div className="add-product-name flex-col">
-          <p>Product Name</p>
-
-          <input
-            type="text"
-            name="name"
-            placeholder="Type here"
-            value={data.name}
-            onChange={onChangeHandler}
-            required
-          />
-        </div>
-
-        <div className="add-product-description flex-col">
-          <p>Product description</p>
-
-          <textarea
-            name="description"
-            rows="6"
-            placeholder="Write content here"
-            value={data.description}
-            onChange={onChangeHandler}
-            required
-          />
-        </div>
-
-        <div className="add-category-price">
-          <div className="add-product-category flex-col">
-            <p>Product category</p>
-
-            <select
-              name="category"
-              value={data.category}
-              onChange={onChangeHandler}
-              required
-            >
-              <option value="Salad">Salad</option>
-              <option value="Rolls">Rolls</option>
-              <option value="Deserts">Deserts</option>
-              <option value="Sandwich">Sandwich</option>
-              <option value="Cake">Cake</option>
-              <option value="Pure Veg">Pure Veg</option>
-              <option value="Pasta">Pasta</option>
-              <option value="Noodles">Noodles</option>
-            </select>
-          </div>
-
-          <div className="add-price flex-col">
-            <p>Product price</p>
+        <form onSubmit={onSubmitHandler}>
+          {/* Image Upload Area */}
+          <div className="form-group">
+            <label className="form-label">Upload Food Image</label>
+            <label htmlFor="image" className="upload-box">
+              <img
+                src={image ? URL.createObjectURL(image) : assets.upload_area}
+                alt="Upload preview"
+                className={image ? "uploaded-preview" : "upload-icon"}
+              />
+              {!image && <span className="upload-hint">Click to choose image</span>}
+            </label>
 
             <input
-              type="number"
-              name="price"
-              placeholder="₹20"
-              value={data.price}
+              type="file"
+              id="image"
+              hidden
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files[0])}
+            />
+          </div>
+
+          {/* Product Name */}
+          <div className="form-group">
+            <label className="form-label">Product Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="e.g. Greek Salad"
+              value={data.name}
               onChange={onChangeHandler}
               required
             />
           </div>
-        </div>
 
-        <button type="submit" className="add-btn">
-          ADD
-        </button>
-      </form>
+          {/* Product Description */}
+          <div className="form-group">
+            <label className="form-label">Product Description</label>
+            <textarea
+              name="description"
+              rows="4"
+              placeholder="Write a brief description of the ingredients and taste..."
+              value={data.description}
+              onChange={onChangeHandler}
+              required
+            />
+          </div>
+
+          {/* Category & Price */}
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Category</label>
+              <select
+                name="category"
+                value={data.category}
+                onChange={onChangeHandler}
+                required
+              >
+                <option value="Salad">Salad</option>
+                <option value="Rolls">Rolls</option>
+                <option value="Deserts">Deserts</option>
+                <option value="Sandwich">Sandwich</option>
+                <option value="Cake">Cake</option>
+                <option value="Pure Veg">Pure Veg</option>
+                <option value="Pasta">Pasta</option>
+                <option value="Noodles">Noodles</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Price (₹)</label>
+              <input
+                type="number"
+                name="price"
+                placeholder="₹ 150"
+                value={data.price}
+                onChange={onChangeHandler}
+                min="1"
+                required
+              />
+            </div>
+          </div>
+
+          <button type="submit" className="add-btn" disabled={loading}>
+            {loading ? "Adding..." : "Add Food Item"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

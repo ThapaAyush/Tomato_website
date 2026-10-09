@@ -1,38 +1,46 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
-*{
+* {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: Outfit;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-body{
+body {
   min-height: 100vh;
-  background-color: #fcfcfc;
+  background-color: #f8fafc;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
 }
 
-a{
+a {
   text-decoration: none;
   color: inherit;
 }
 
-hr{
+button {
+  font-family: inherit;
+}
+
+hr {
   border: none;
   height: 1px;
-  background-color: #edf0f4;
+  background-color: #e2e8f0;
 }
 
-.app-content{
+.app-content {
   display: flex;
+  min-height: calc(100vh - 68px);
+  background-color: #f8fafc;
 }
 
-.flex-col{
+.flex-col {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.cursor{
+.cursor {
   cursor: pointer;
 }

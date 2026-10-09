@@ -1,15 +1,15 @@
 .order {
     width: 100%;
-    padding: 30px 42px 60px;
-    background-color: #fcfcfc;
-    min-height: 100vh;
+    padding: 30px 36px 60px;
+    background-color: #f8fafc;
+    min-height: calc(100vh - 68px);
 }
 
 .order h3 {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
-    color: #262626;
-    margin-bottom: 24px;
+    color: #1e293b;
+    margin-bottom: 22px;
 }
 
 /* Scrollable Container with custom scrollbar */
@@ -18,45 +18,6 @@
     max-height: calc(100vh - 170px);
     overflow-y: auto;
     padding-right: 10px;
-    /* Firefox scrollbar */
-    scrollbar-width: thin;
-    scrollbar-color: tomato #f1f1f1;
-}
-
-/* Chrome / Safari / Edge Custom Scrollbar */
-.order-list-scroll-container::-webkit-scrollbar {
-    width: 8px;
-}
-
-.order-list-scroll-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 6px;
-}
-
-.order-list-scroll-container::-webkit-scrollbar-thumb {
-    background: tomato;
-    border-radius: 6px;
-}
-
-.order-list-scroll-container::-webkit-scrollbar-thumb:hover {
-    background: #e2492f;
-}
-
-.order-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.order-loading,
-.order-empty {
-    background: #ffffff;
-    border: 1px dashed #dcdcdc;
-    border-radius: 10px;
-    padding: 40px;
-    text-align: center;
-    color: #888888;
-    font-size: 15px;
 }
 
 /* Individual Order Card matching screenshot */
@@ -64,19 +25,22 @@
     display: grid;
     grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr;
     align-items: start;
-    gap: 24px;
-    border: 1px solid tomato;
-    padding: 24px 28px;
+    gap: 20px;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid tomato;
+    padding: 20px 24px;
     font-size: 14px;
-    color: #505050;
+    color: #475569;
     background: #ffffff;
-    border-radius: 4px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
-    transition: box-shadow 0.2s ease;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
 }
 
 .order-item:hover {
-    box-shadow: 0 4px 12px rgba(255, 99, 71, 0.08);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    border-color: #cbd5e1;
+    border-left-color: tomato;
 }
 
 .order-parcel-icon {

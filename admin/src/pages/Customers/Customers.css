@@ -1,8 +1,8 @@
 .customers-page {
     width: 100%;
-    padding: 30px 42px 60px;
-    background-color: #fcfcfc;
-    min-height: 100vh;
+    padding: 30px 36px 60px;
+    background-color: #f8fafc;
+    min-height: calc(100vh - 68px);
 }
 
 /* Header Section */
