@@ -193,83 +193,6 @@
     border-top: 1px solid #f1f5f9;
 }
 
-/* Store quick jump button */
-.sidebar-store-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    text-decoration: none;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.sidebar-store-link:hover {
-    background: #eff6ff;
-    border-color: #bfdbfe;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
-}
-
-.store-link-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.store-link-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    color: #2563eb;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.2s ease;
-}
-
-.sidebar-store-link:hover .store-link-icon {
-    background: #2563eb;
-    color: #ffffff;
-    border-color: transparent;
-}
-
-.store-link-text {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
-
-.store-link-title {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0;
-    line-height: 1.2;
-}
-
-.store-link-sub {
-    font-size: 10.5px;
-    color: #64748b;
-    line-height: 1.2;
-}
-
-.store-external-arrow {
-    color: #94a3b8;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-}
-
-.sidebar-store-link:hover .store-external-arrow {
-    color: #2563eb;
-    transform: translate(2px, -2px);
-}
-
 /* System status card */
 .sidebar-status-card {
     display: flex;
@@ -350,8 +273,6 @@
     .sidebar-section-header,
     .sidebar-subtitle,
     .sidebar-title,
-    .store-link-text,
-    .store-external-arrow,
     .status-text,
     .version-tag {
         display: none;
@@ -365,11 +286,6 @@
 
     .sidebar-bottom {
         align-items: center;
-    }
-
-    .sidebar-store-link {
-        padding: 8px;
-        justify-content: center;
     }
 
     .sidebar-status-card {

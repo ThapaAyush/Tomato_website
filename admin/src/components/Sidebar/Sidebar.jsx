@@ -3,8 +3,6 @@ import './Sidebar.css'
 import { NavLink } from 'react-router-dom'
 
 const Sidebar = () => {
-  const frontendUrl = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
-
   return (
     <aside className='admin-sidebar'>
       <div className="sidebar-top">
@@ -97,33 +95,6 @@ const Sidebar = () => {
       </div>
 
       <div className="sidebar-bottom">
-        {/* Quick jump to customer website */}
-        <a
-          href={frontendUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="sidebar-store-link"
-          title="Open customer store in new tab"
-        >
-          <div className="store-link-content">
-            <span className="store-link-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
-            </span>
-            <div className="store-link-text">
-              <p className="store-link-title">Customer Store</p>
-              <span className="store-link-sub">Visit live storefront</span>
-            </div>
-          </div>
-          <svg className="store-external-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-            <polyline points="15 3 21 3 21 9" />
-            <line x1="10" y1="14" x2="21" y2="3" />
-          </svg>
-        </a>
-
         {/* Server & version badge */}
         <div className="sidebar-status-card">
           <div className="status-row">
