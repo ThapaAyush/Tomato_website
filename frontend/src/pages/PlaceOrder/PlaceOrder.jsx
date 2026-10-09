@@ -12,6 +12,8 @@ const PlaceOrder = ({ setShowLogin }) => {
     cartItems,
     setCartItems,
     clearCart,
+    promoCode,
+    getDiscountAmount,
     url,
   } = useContext(StoreContext);
 
@@ -118,10 +120,15 @@ const PlaceOrder = ({ setShowLogin }) => {
     try {
       setSubmitting(true);
 
+      const discount = typeof getDiscountAmount === "function" ? getDiscountAmount() : 0;
+      const payableAmount = Math.max(0, totalAmount - discount) + 2;
+
       const orderPayload = {
         address: data,
         items: orderItems,
-        amount: totalAmount + 2,
+        amount: payableAmount,
+        discount: discount,
+        promoCode: promoCode || null,
         paymentMethod: paymentMethod,
       };
 
@@ -324,6 +331,16 @@ const PlaceOrder = ({ setShowLogin }) => {
               <p>₹{getTotalCartAmount()}</p>
             </div>
 
+            {typeof getDiscountAmount === "function" && getDiscountAmount() > 0 && (
+              <div className="cart-total-details cart-discount-row" style={{ color: '#1b8a3e', background: '#eef9f1', padding: '8px 12px', borderRadius: '8px', margin: '4px 0' }}>
+                <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', color: '#1b8a3e', margin: 0 }}>
+                  <span>🎁 Promo Discount ({promoCode})</span>
+                  <span style={{ background: '#1b8a3e', color: '#fff', fontSize: '0.72rem', padding: '2px 6px', borderRadius: '6px' }}>50% OFF</span>
+                </p>
+                <b style={{ color: '#1b8a3e', margin: 0 }}>-₹{getDiscountAmount()}</b>
+              </div>
+            )}
+
             <div className="cart-total-details">
               <p>Delivery Fee</p>
               <p>₹{getTotalCartAmount() === 0 ? 0 : 2}</p>
@@ -333,7 +350,12 @@ const PlaceOrder = ({ setShowLogin }) => {
 
             <div className="cart-total-details">
               <b>Total</b>
-              <b>₹{getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</b>
+              <b>
+                ₹
+                {getTotalCartAmount() === 0
+                  ? 0
+                  : Math.max(0, getTotalCartAmount() - (typeof getDiscountAmount === "function" ? getDiscountAmount() : 0)) + 2}
+              </b>
             </div>
           </div>
 

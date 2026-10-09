@@ -24,10 +24,43 @@ const StoreContextProvider = (props) => {
     const [food_list, setFoodList] = useState(sampleFoodList)
 
     const [role, setRole] = useState(() => localStorage.getItem("role") || "Customer");
+    const [promoCode, setPromoCode] = useState(() => localStorage.getItem("food-del-promo") || "");
+
+    const applyPromoCode = (inputCode) => {
+        const clean = (inputCode || "").trim().toUpperCase();
+        if (clean === "OFF50%" || clean === "OFF50") {
+            setPromoCode("OFF50%");
+            localStorage.setItem("food-del-promo", "OFF50%");
+            return { success: true, message: "Promo code OFF50% applied! 50% discount has been reduced from your order." };
+        } else {
+            return { success: false, message: 'Invalid promo code! Only "OFF50%" is valid for 50% discount.' };
+        }
+    };
+
+    const removePromoCode = () => {
+        setPromoCode("");
+        localStorage.removeItem("food-del-promo");
+    };
+
+    const getDiscountAmount = () => {
+        const total = getTotalCartAmount();
+        if ((promoCode === "OFF50%" || promoCode === "OFF50") && total > 0) {
+            return Math.round(total * 0.5);
+        }
+        return 0;
+    };
+
+    const getFinalOrderAmount = () => {
+        const total = getTotalCartAmount();
+        if (total === 0) return 0;
+        const discount = getDiscountAmount();
+        return Math.max(0, total - discount) + 2;
+    };
 
     const clearCart = () => {
         setCartItems({});
         localStorage.removeItem(storageKey);
+        removePromoCode();
     };
 
     const addToCart = async (itemId) => {
@@ -129,6 +162,11 @@ const StoreContextProvider = (props) => {
         addToCart,
         removeFromCart,
         getTotalCartAmount,
+        promoCode,
+        applyPromoCode,
+        removePromoCode,
+        getDiscountAmount,
+        getFinalOrderAmount,
         url,
         token,
         setToken,

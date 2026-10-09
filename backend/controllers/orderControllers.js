@@ -34,7 +34,7 @@ const razorpay = new Razorpay({
 const placeOrder = async (req, res) => {
     try {
         const userId = req.body?.userId || req.userId;
-        const { items, amount, address, paymentMethod = "cod" } = req.body;
+        const { items, amount, address, paymentMethod = "cod", promoCode = "", discount = 0 } = req.body;
 
         if (!userId) {
             return res.json({ success: false, message: "Please login to place an order" });
@@ -50,7 +50,9 @@ const placeOrder = async (req, res) => {
             amount: Number(amount || 0),
             address,
             payment: false,
-            status: "Food Processing"
+            status: "Food Processing",
+            promoCode: String(promoCode || ""),
+            discount: Number(discount || 0)
         });
 
         await newOrder.save();
