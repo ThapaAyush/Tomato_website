@@ -23,7 +23,7 @@ const PlaceOrder = ({ setShowLogin }) => {
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [isCustomCity, setIsCustomCity] = useState(false);
   const [isCustomState, setIsCustomState] = useState(false);
-  const [countryCode, setCountryCode] = useState("+977");
+  const [countryCode, setCountryCode] = useState("+91");
   const [phoneDigits, setPhoneDigits] = useState("");
 
   const [data, setData] = useState({

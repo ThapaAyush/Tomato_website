@@ -332,8 +332,8 @@ export const COUNTRIES = [
 ];
 
 export const COUNTRY_PHONE_CODES = [
-  { code: "+977", country: "Nepal", flag: "🇳🇵", label: "🇳🇵 +977 (Nepal)" },
   { code: "+91", country: "India", flag: "🇮🇳", label: "🇮🇳 +91 (India)" },
+  { code: "+977", country: "Nepal", flag: "🇳🇵", label: "🇳🇵 +977 (Nepal)" },
   { code: "+1", country: "USA / Canada", flag: "🇺🇸", label: "🇺🇸 +1 (USA/CA)" },
   { code: "+44", country: "UK", flag: "🇬🇧", label: "🇬🇧 +44 (UK)" },
   { code: "+971", country: "UAE", flag: "🇦🇪", label: "🇦🇪 +971 (UAE)" },
