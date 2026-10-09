@@ -216,3 +216,64 @@
         max-width: 100%;
     }
 }
+
+@media (max-width: 640px) {
+    .order {
+        padding: 16px 12px 40px;
+        min-height: auto;
+    }
+
+    .order h3 {
+        font-size: 20px;
+        margin-bottom: 16px;
+    }
+
+    .order-list-scroll-container {
+        max-height: none;
+        overflow-y: visible;
+        padding-right: 0;
+    }
+
+    .order-item {
+        padding: 14px 14px;
+        border-radius: 10px;
+        gap: 12px;
+    }
+
+    .order-parcel-icon {
+        width: 44px;
+    }
+
+    .order-status-select {
+        font-size: 16px !important;
+        padding: 12px 14px;
+        min-height: 44px;
+        border-radius: 8px;
+    }
+
+    .order-cancel-btn {
+        min-height: 40px;
+        font-size: 13px;
+        padding: 10px;
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 380px) {
+    .order {
+        padding: 12px 8px 30px;
+    }
+
+    .order h3 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    .order-item {
+        padding: 12px 10px;
+    }
+
+    .order-item-food {
+        font-size: 13.5px;
+    }
+}

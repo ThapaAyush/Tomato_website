@@ -157,3 +157,71 @@
         gap: 0;
     }
 }
+
+@media (max-width: 640px) {
+    .add-page {
+        padding: 16px 12px 36px;
+        min-height: auto;
+    }
+
+    .add-card {
+        padding: 18px 14px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 100%;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .add-card-header {
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+    }
+
+    .add-card-header h2 {
+        font-size: 20px;
+    }
+
+    .upload-box {
+        max-width: 100%;
+        padding: 20px 16px;
+        background-color: #fafbfc;
+    }
+
+    .upload-icon {
+        width: 60px;
+    }
+
+    .add-card input[type="text"],
+    .add-card input[type="number"],
+    .add-card textarea,
+    .add-card select {
+        font-size: 16px !important;
+        padding: 12px 14px;
+    }
+
+    .add-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
+        margin-top: 10px;
+        min-height: 48px;
+    }
+}
+
+@media (max-width: 380px) {
+    .add-page {
+        padding: 12px 8px 28px;
+    }
+
+    .add-card {
+        padding: 14px 10px;
+    }
+
+    .add-card-header h2 {
+        font-size: 18px;
+    }
+
+    .add-card-header p {
+        font-size: 12.5px;
+    }
+}

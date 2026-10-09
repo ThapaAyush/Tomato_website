@@ -168,3 +168,60 @@
         height: 44px;
     }
 }
+
+@media (max-width: 640px) {
+    .list-page {
+        padding: 16px 12px 36px;
+        min-height: auto;
+    }
+
+    .list-card {
+        padding: 16px 12px;
+        border-radius: 12px;
+    }
+
+    .list-card-header {
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        gap: 10px;
+    }
+
+    .list-card-header h2 {
+        font-size: 20px;
+    }
+
+    .list-card-header p {
+        font-size: 12.5px;
+    }
+
+    .list-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+    }
+
+    .list-table-header,
+    .list-table-row {
+        min-width: 520px;
+        padding: 10px 12px;
+    }
+
+    .delete-btn {
+        padding: 7px 12px;
+        min-height: 36px;
+    }
+}
+
+@media (max-width: 380px) {
+    .list-page {
+        padding: 12px 8px 28px;
+    }
+
+    .list-card {
+        padding: 14px 10px;
+    }
+
+    .list-card-header h2 {
+        font-size: 18px;
+    }
+}

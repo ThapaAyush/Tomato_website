@@ -263,6 +263,7 @@
     .customers-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 16px;
     }
 
     .customers-metrics-row {
@@ -277,5 +278,97 @@
     .customer-order-row {
         flex-direction: column;
         gap: 6px;
+    }
+}
+
+@media (max-width: 640px) {
+    .customers-page {
+        padding: 16px 12px 36px;
+        min-height: auto;
+    }
+
+    .customers-title-wrap {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .customers-title {
+        font-size: 22px;
+    }
+
+    .customers-subtitle {
+        font-size: 13px;
+    }
+
+    .customers-date-filter {
+        width: 100%;
+    }
+
+    .date-input-wrap {
+        width: 100%;
+    }
+
+    .date-input {
+        flex: 1;
+        font-size: 16px !important;
+        padding: 10px 12px;
+        min-height: 44px;
+    }
+
+    .date-clear-btn {
+        min-height: 44px;
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .metric-card {
+        min-width: 0;
+        padding: 14px 16px;
+    }
+
+    .metric-number {
+        font-size: 22px;
+    }
+
+    .customer-card {
+        padding: 14px 14px;
+        border-radius: 10px;
+    }
+
+    .customer-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .customer-name {
+        font-size: 15px;
+    }
+
+    .customer-email {
+        font-size: 12.5px;
+        word-break: break-all;
+    }
+
+    .order-items-summary {
+        font-size: 13.5px;
+    }
+}
+
+@media (max-width: 380px) {
+    .customers-page {
+        padding: 12px 8px 28px;
+    }
+
+    .customers-title {
+        font-size: 20px;
+    }
+
+    .customer-card {
+        padding: 12px 10px;
+    }
+
+    .metric-card {
+        padding: 12px 14px;
     }
 }

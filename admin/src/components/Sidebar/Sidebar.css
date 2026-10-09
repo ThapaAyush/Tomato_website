@@ -68,8 +68,8 @@
     color: tomato;
 }
 
-/* Tablet & Mobile */
-@media (max-width: 768px) {
+/* Tablet View (641px - 768px) */
+@media (max-width: 768px) and (min-width: 641px) {
     .sidebar {
         width: 72px;
         min-width: 72px;
@@ -83,5 +83,73 @@
 
     .sidebar-option p {
         display: none;
+    }
+}
+
+/* Mobile Phone View (<= 640px): Sticky Top Tabs Bar */
+@media (max-width: 640px) {
+    .sidebar {
+        width: 100%;
+        min-width: 100%;
+        min-height: auto;
+        border-right: none;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 10px 12px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .sidebar-options {
+        flex-direction: row;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .sidebar-options::-webkit-scrollbar {
+        display: none;
+    }
+
+    .sidebar-option {
+        padding: 8px 14px;
+        gap: 8px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        border-radius: 8px;
+    }
+
+    .sidebar-option:hover {
+        transform: none;
+    }
+
+    .sidebar-option p {
+        display: block !important;
+        font-size: 13px;
+    }
+
+    .sidebar-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .sidebar-icon svg {
+        width: 17px;
+        height: 17px;
+    }
+}
+
+@media (max-width: 380px) {
+    .sidebar {
+        padding: 8px 10px;
+    }
+
+    .sidebar-option {
+        padding: 7px 11px;
+        font-size: 12.5px;
     }
 }

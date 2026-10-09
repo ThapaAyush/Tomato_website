@@ -259,3 +259,46 @@
 .logout-item:hover .admin-item-title {
     color: #dc2626;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+    .navbar {
+        padding: 10px 14px;
+    }
+
+    .navbar .logo {
+        width: 90px;
+    }
+
+    .admin-pill {
+        font-size: 10px;
+        padding: 2px 7px;
+        letter-spacing: 0.4px;
+    }
+
+    .navbar .profile {
+        width: 36px;
+        height: 36px;
+    }
+
+    .admin-profile-dropdown {
+        width: min(250px, calc(100vw - 20px));
+        right: 0;
+        top: calc(100% + 8px);
+    }
+}
+
+@media (max-width: 380px) {
+    .navbar-brand {
+        gap: 8px;
+    }
+
+    .navbar .logo {
+        width: 82px;
+    }
+
+    .admin-pill {
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+}
