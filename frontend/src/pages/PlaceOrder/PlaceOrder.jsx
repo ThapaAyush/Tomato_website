@@ -3,7 +3,7 @@ import axios from "axios";
 import "./PlaceOrder.css";
 import { StoreContext } from "../../context/StoreContext";
 import { useNavigate } from "react-router-dom";
-import { INDIAN_CITIES, INDIAN_STATES, CITY_STATE_MAPPING, COUNTRIES } from "../../assets/indiaLocations";
+import { INDIAN_CITIES, INDIAN_STATES, CITY_STATE_MAPPING, COUNTRIES, COUNTRY_PHONE_CODES } from "../../assets/indiaLocations";
 
 const PlaceOrder = ({ setShowLogin }) => {
   const {
@@ -23,6 +23,8 @@ const PlaceOrder = ({ setShowLogin }) => {
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [isCustomCity, setIsCustomCity] = useState(false);
   const [isCustomState, setIsCustomState] = useState(false);
+  const [countryCode, setCountryCode] = useState("+977");
+  const [phoneDigits, setPhoneDigits] = useState("");
 
   const [data, setData] = useState({
     firstName: "",
@@ -43,6 +45,19 @@ const PlaceOrder = ({ setShowLogin }) => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  // Handle country changes & auto-sync calling code
+  const handleCountryChange = (event) => {
+    const val = event.target.value;
+    setData((prev) => ({ ...prev, country: val }));
+    if (val === "Nepal") setCountryCode("+977");
+    else if (val === "India") setCountryCode("+91");
+    else if (val === "United States" || val === "Canada") setCountryCode("+1");
+    else if (val === "United Kingdom") setCountryCode("+44");
+    else if (val === "Australia") setCountryCode("+61");
+    else if (val === "United Arab Emirates") setCountryCode("+971");
+    else if (val === "Singapore") setCountryCode("+65");
   };
 
   // Handle city selection
@@ -152,11 +167,21 @@ const PlaceOrder = ({ setShowLogin }) => {
     try {
       setSubmitting(true);
 
+      const fullPhone = `${countryCode} ${phoneDigits.trim()}`.trim();
+      if (!phoneDigits.trim()) {
+        alert("Please enter your phone number");
+        setSubmitting(false);
+        return;
+      }
+
       const discount = typeof getDiscountAmount === "function" ? getDiscountAmount() : 0;
       const payableAmount = Math.max(0, totalAmount - discount) + 2;
 
       const orderPayload = {
-        address: data,
+        address: {
+          ...data,
+          phone: fullPhone,
+        },
         items: orderItems,
         amount: payableAmount,
         discount: discount,
@@ -217,7 +242,7 @@ const PlaceOrder = ({ setShowLogin }) => {
         prefill: {
           name: `${data.firstName} ${data.lastName}`.trim(),
           email: data.email,
-          contact: data.phone,
+          contact: `${countryCode}${phoneDigits}`.replace(/\D/g, ""),
         },
         theme: {
           color: "#ff4d4d",
@@ -292,14 +317,28 @@ const PlaceOrder = ({ setShowLogin }) => {
             required
           />
 
-          <input
-            type="tel"
-            name="phone"
-            value={data.phone}
-            onChange={onChangeHandler}
-            placeholder="Phone Number"
-            required
-          />
+          <div className="phone-input-container">
+            <select
+              className="phone-code-select"
+              value={countryCode}
+              onChange={(e) => setCountryCode(e.target.value)}
+              title="Select Country Calling Code"
+            >
+              {COUNTRY_PHONE_CODES.map((item) => (
+                <option key={item.code} value={item.code}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+            <input
+              type="tel"
+              name="phone"
+              value={phoneDigits}
+              onChange={(e) => setPhoneDigits(e.target.value.replace(/[^0-9]/g, ""))}
+              placeholder="Phone Number (e.g. 9812345678)"
+              required
+            />
+          </div>
         </div>
 
         <input
@@ -409,7 +448,7 @@ const PlaceOrder = ({ setShowLogin }) => {
           <select
             name="country"
             value={data.country}
-            onChange={onChangeHandler}
+            onChange={handleCountryChange}
             required
           >
             {COUNTRIES.map((country) => (

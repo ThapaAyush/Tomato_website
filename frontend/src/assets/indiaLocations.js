@@ -330,3 +330,19 @@ export const COUNTRIES = [
   "United Arab Emirates",
   "Singapore"
 ];
+
+export const COUNTRY_PHONE_CODES = [
+  { code: "+977", country: "Nepal", flag: "🇳🇵", label: "🇳🇵 +977 (Nepal)" },
+  { code: "+91", country: "India", flag: "🇮🇳", label: "🇮🇳 +91 (India)" },
+  { code: "+1", country: "USA / Canada", flag: "🇺🇸", label: "🇺🇸 +1 (USA/CA)" },
+  { code: "+44", country: "UK", flag: "🇬🇧", label: "🇬🇧 +44 (UK)" },
+  { code: "+971", country: "UAE", flag: "🇦🇪", label: "🇦🇪 +971 (UAE)" },
+  { code: "+61", country: "Australia", flag: "🇦🇺", label: "🇦🇺 +61 (Australia)" },
+  { code: "+65", country: "Singapore", flag: "🇸🇬", label: "🇸🇬 +65 (Singapore)" },
+  { code: "+880", country: "Bangladesh", flag: "🇧🇩", label: "🇧🇩 +880 (Bangladesh)" },
+  { code: "+975", country: "Bhutan", flag: "🇧🇹", label: "🇧🇹 +975 (Bhutan)" },
+  { code: "+94", country: "Sri Lanka", flag: "🇱🇰", label: "🇱🇰 +94 (Sri Lanka)" },
+  { code: "+81", country: "Japan", flag: "🇯🇵", label: "🇯🇵 +81 (Japan)" },
+  { code: "+49", country: "Germany", flag: "🇩🇪", label: "🇩🇪 +49 (Germany)" },
+  { code: "+33", country: "France", flag: "🇫🇷", label: "🇫🇷 +33 (France)" }
+];
