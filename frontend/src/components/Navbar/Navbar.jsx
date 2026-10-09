@@ -1,11 +1,11 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 import './Navbar.css';
 
 import { assets } from '../../assets/assets';
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import { StoreContext } from '../../context/StoreContext';
 
@@ -18,6 +18,79 @@ const Navbar = ({ setShowLogin }) => {
 
   const { getTotalCartAmount, token, setToken, food_list, addToCart, url, role, setRole } = useContext(StoreContext);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isHomePage = location.pathname === '/' || location.pathname === '/home';
+
+  // Sync active menu state with current route, hash, and scroll position
+  useEffect(() => {
+    if (!isHomePage) {
+      setMenu("");
+      return;
+    }
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 220;
+      const exploreMenuEl = document.getElementById('explore-menu');
+      const appDownloadEl = document.getElementById('add-download');
+      const footerEl = document.getElementById('footer');
+
+      if (footerEl && window.innerHeight + window.scrollY >= document.body.offsetHeight - 60) {
+        setMenu("contact-us");
+      } else if (appDownloadEl && scrollPosition >= appDownloadEl.offsetTop) {
+        setMenu("mobile-app");
+      } else if (exploreMenuEl && scrollPosition >= exploreMenuEl.offsetTop) {
+        setMenu("menu");
+      } else {
+        setMenu("home");
+      }
+    };
+
+    if (location.hash === '#explore-menu') {
+      setMenu("menu");
+    } else if (location.hash === '#add-download') {
+      setMenu("mobile-app");
+    } else if (location.hash === '#footer') {
+      setMenu("contact-us");
+    } else {
+      handleScroll();
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isHomePage, location.hash]);
+
+  const handleNavClick = (sectionId, menuName) => {
+    setMenu(menuName);
+
+    if (sectionId === 'home') {
+      if (!isHomePage) {
+        navigate('/');
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      }
+      return;
+    }
+
+    if (!isHomePage) {
+      navigate(`/#${sectionId}`);
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        window.history.replaceState(null, '', `/#${sectionId}`);
+      }
+    }
+  };
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -52,23 +125,29 @@ const Navbar = ({ setShowLogin }) => {
   return (
     <div className='navbar'>
 
-      <Link to='/'>
+      <Link to='/' onClick={() => handleNavClick('home', 'home')}>
         <img src={assets.logo} className="logo" alt="" />
       </Link>
 
       <ul className='navbar-menu'>
 
-        <Link
-          to='/'
-          onClick={() => setMenu("home")}
+        <a
+          href='/'
+          onClick={(e) => {
+            e.preventDefault();
+            handleNavClick('home', 'home');
+          }}
           className={menu === "home" ? "active" : ""}
         >
           home
-        </Link>
+        </a>
 
         <a
           href='#explore-menu'
-          onClick={() => setMenu("menu")}
+          onClick={(e) => {
+            e.preventDefault();
+            handleNavClick('explore-menu', 'menu');
+          }}
           className={menu === "menu" ? "active" : ""}
         >
           menu
@@ -76,7 +155,10 @@ const Navbar = ({ setShowLogin }) => {
 
         <a
           href='#add-download'
-          onClick={() => setMenu("mobile-app")}
+          onClick={(e) => {
+            e.preventDefault();
+            handleNavClick('add-download', 'mobile-app');
+          }}
           className={menu === "mobile-app" ? "active" : ""}
         >
           mobile-app
@@ -84,7 +166,10 @@ const Navbar = ({ setShowLogin }) => {
 
         <a
           href='#footer'
-          onClick={() => setMenu("contact-us")}
+          onClick={(e) => {
+            e.preventDefault();
+            handleNavClick('footer', 'contact-us');
+          }}
           className={menu === "contact-us" ? "active" : ""}
         >
           contact us
