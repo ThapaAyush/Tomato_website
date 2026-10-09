@@ -3,6 +3,7 @@ import axios from "axios";
 import "./PlaceOrder.css";
 import { StoreContext } from "../../context/StoreContext";
 import { useNavigate } from "react-router-dom";
+import { INDIAN_CITIES, INDIAN_STATES, CITY_STATE_MAPPING, COUNTRIES } from "../../assets/indiaLocations";
 
 const PlaceOrder = ({ setShowLogin }) => {
   const {
@@ -20,6 +21,8 @@ const PlaceOrder = ({ setShowLogin }) => {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [isCustomCity, setIsCustomCity] = useState(false);
+  const [isCustomState, setIsCustomState] = useState(false);
 
   const [data, setData] = useState({
     firstName: "",
@@ -29,7 +32,7 @@ const PlaceOrder = ({ setShowLogin }) => {
     city: "",
     state: "",
     zipcode: "",
-    country: "",
+    country: "India",
     phone: "",
   });
 
@@ -40,6 +43,35 @@ const PlaceOrder = ({ setShowLogin }) => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  // Handle city selection
+  const handleCitySelect = (event) => {
+    const val = event.target.value;
+    if (val === "other") {
+      setIsCustomCity(true);
+      setData((prev) => ({ ...prev, city: "" }));
+    } else {
+      setIsCustomCity(false);
+      const matchedState = CITY_STATE_MAPPING[val];
+      setData((prev) => ({
+        ...prev,
+        city: val,
+        ...(matchedState ? { state: matchedState } : {}),
+      }));
+    }
+  };
+
+  // Handle state selection
+  const handleStateSelect = (event) => {
+    const val = event.target.value;
+    if (val === "other") {
+      setIsCustomState(true);
+      setData((prev) => ({ ...prev, state: "" }));
+    } else {
+      setIsCustomState(false);
+      setData((prev) => ({ ...prev, state: val }));
+    }
   };
 
   // Load Razorpay checkout script
@@ -280,23 +312,87 @@ const PlaceOrder = ({ setShowLogin }) => {
         />
 
         <div className="multi-fields">
-          <input
-            type="text"
-            name="city"
-            value={data.city}
-            onChange={onChangeHandler}
-            placeholder="City"
-            required
-          />
+          {/* City - Scrollable selection with 100+ cities in India */}
+          {isCustomCity ? (
+            <div className="custom-input-wrap">
+              <input
+                type="text"
+                name="city"
+                value={data.city}
+                onChange={onChangeHandler}
+                placeholder="Type your City name"
+                required
+                autoFocus
+              />
+              <button
+                type="button"
+                className="switch-select-btn"
+                onClick={() => {
+                  setIsCustomCity(false);
+                  setData((prev) => ({ ...prev, city: "" }));
+                }}
+                title="Choose from list of cities"
+              >
+                📋 Choose City
+              </button>
+            </div>
+          ) : (
+            <select
+              name="city"
+              value={data.city}
+              onChange={handleCitySelect}
+              required
+            >
+              <option value="">-- Select City in India --</option>
+              {INDIAN_CITIES.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+              <option value="other">✏️ Other City (Type manually)</option>
+            </select>
+          )}
 
-          <input
-            type="text"
-            name="state"
-            value={data.state}
-            onChange={onChangeHandler}
-            placeholder="State"
-            required
-          />
+          {/* State - Scrollable selection with all Indian States & UTs */}
+          {isCustomState ? (
+            <div className="custom-input-wrap">
+              <input
+                type="text"
+                name="state"
+                value={data.state}
+                onChange={onChangeHandler}
+                placeholder="Type State name"
+                required
+                autoFocus
+              />
+              <button
+                type="button"
+                className="switch-select-btn"
+                onClick={() => {
+                  setIsCustomState(false);
+                  setData((prev) => ({ ...prev, state: "" }));
+                }}
+                title="Choose from list of states"
+              >
+                📋 Choose State
+              </button>
+            </div>
+          ) : (
+            <select
+              name="state"
+              value={data.state}
+              onChange={handleStateSelect}
+              required
+            >
+              <option value="">-- Select State --</option>
+              {INDIAN_STATES.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+              <option value="other">✏️ Other State (Type manually)</option>
+            </select>
+          )}
         </div>
 
         <div className="multi-fields">
@@ -305,18 +401,23 @@ const PlaceOrder = ({ setShowLogin }) => {
             name="zipcode"
             value={data.zipcode}
             onChange={onChangeHandler}
-            placeholder="Zipcode"
+            placeholder="Zipcode / PIN Code"
             required
           />
 
-          <input
-            type="text"
+          {/* Country - Scrollable selection defaulting to India */}
+          <select
             name="country"
             value={data.country}
             onChange={onChangeHandler}
-            placeholder="Country"
             required
-          />
+          >
+            {COUNTRIES.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
