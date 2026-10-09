@@ -407,3 +407,435 @@
     right: 6px;
   }
 }
+
+/* ========================================================
+   INLINE ERROR BANNER (REPLACES INTRUSIVE BROWSER ALERTS)
+   ======================================================== */
+.place-order-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
+  animation: bannerSlideIn 0.25s ease-out;
+}
+
+.place-order-error-banner .error-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.place-order-error-banner .error-text {
+  margin: 0;
+  flex: 1;
+  line-height: 1.4;
+}
+
+.place-order-error-banner .clear-error-btn {
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  opacity: 0.7;
+  transition: opacity 0.2s, background-color 0.2s;
+  width: auto;
+  margin: 0;
+}
+
+.place-order-error-banner .clear-error-btn:hover {
+  opacity: 1;
+  background: rgba(220, 38, 38, 0.1);
+}
+
+@keyframes bannerSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================================
+   BIG CONGO (CONGRATULATIONS) CELEBRATION MODAL (LAPTOP-FITTED)
+   ======================================================== */
+.congo-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  animation: congoFadeIn 0.25s ease-out forwards;
+}
+
+.congo-modal-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 22px;
+  max-width: 460px;
+  width: 100%;
+  max-height: calc(100vh - 32px);
+  padding: 22px 24px 20px;
+  text-align: center;
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  overflow-y: auto;
+  box-sizing: border-box;
+  margin: auto;
+  animation: congoCardSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Floating celebratory confetti background */
+.congo-confetti-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.congo-confetti {
+  position: absolute;
+  font-size: 1.15rem;
+  opacity: 0.8;
+  user-select: none;
+  animation: congoFloat 3s ease-in-out infinite;
+}
+
+.congo-confetti.c1 { top: 8px; left: 18px; animation-delay: 0s; }
+.congo-confetti.c2 { top: 16px; right: 42px; animation-delay: 0.4s; font-size: 0.95rem; }
+.congo-confetti.c3 { top: 50px; left: 12px; animation-delay: 0.8s; }
+.congo-confetti.c4 { top: 55px; right: 14px; animation-delay: 1.2s; font-size: 1.05rem; }
+.congo-confetti.c6 { bottom: 50px; right: 16px; animation-delay: 1.6s; font-size: 0.9rem; }
+.congo-confetti.c7 { bottom: 15px; left: 24px; animation-delay: 0.6s; }
+
+@keyframes congoFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) rotate(12deg) scale(1.08);
+  }
+}
+
+/* Close button */
+.congo-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  padding: 0;
+  margin: 0;
+}
+
+.congo-modal-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Compact Animated Checkmark Badge */
+.congo-badge-wrapper {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.congo-badge-glow {
+  position: absolute;
+  inset: -6px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0) 70%);
+  border-radius: 50%;
+  animation: congoPulse 2s ease-in-out infinite;
+}
+
+.congo-badge-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+  position: relative;
+  z-index: 2;
+}
+
+.congo-svg-check {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.congo-svg-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2.5;
+  stroke: rgba(255, 255, 255, 0.5);
+  animation: congoDrawCircle 0.5s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.congo-svg-path {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  stroke-width: 4;
+  stroke: #ffffff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: congoDrawCheck 0.35s cubic-bezier(0.65, 0, 0.45, 1) 0.4s forwards;
+}
+
+@keyframes congoDrawCircle {
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes congoDrawCheck {
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes congoPulse {
+  0%, 100% { transform: scale(0.95); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 0.85; }
+}
+
+/* Modal text header */
+.congo-heading {
+  margin: 0 0 4px;
+  font-size: 1.65rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+  line-height: 1.15;
+}
+
+.congo-lead {
+  margin: 0 auto 14px;
+  font-size: 0.86rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+/* Compact Order receipt card */
+.congo-order-receipt {
+  position: relative;
+  z-index: 2;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 12px 16px;
+  text-align: left;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.congo-receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-id-tag {
+  font-size: 0.84rem;
+  color: #475569;
+}
+
+.order-id-tag strong {
+  color: #ff5b2e;
+  font-family: monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+}
+
+.eta-tag {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #059669;
+  background: #ecfdf5;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.congo-receipt-row.payment-amount-row {
+  padding: 6px 0;
+  border-top: 1px dashed #e2e8f0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.payment-mode-pill {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.total-amount-pill {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.total-amount-pill strong {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #ff5b2e;
+  margin-left: 3px;
+}
+
+/* Delivery address details (single clean row) */
+.congo-address-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #475569;
+  line-height: 1.35;
+}
+
+.congo-address-row .address-icon {
+  font-size: 0.88rem;
+  flex-shrink: 0;
+}
+
+.congo-address-row .address-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ordered items list chips */
+.congo-items-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.item-chip {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.76rem;
+  color: #334155;
+}
+
+.item-chip strong {
+  color: #ff5b2e;
+  margin-left: 2px;
+}
+
+/* Action buttons (side-by-side) */
+.congo-actions {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 10px;
+}
+
+.congo-primary-btn {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #ff6f3c 0%, #ff4d4d 100%);
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 16px -2px rgba(255, 77, 77, 0.35);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.congo-primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -2px rgba(255, 77, 77, 0.45);
+  background: linear-gradient(135deg, #ff5b2e 0%, #ff3b3b 100%);
+}
+
+.congo-secondary-btn {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.congo-secondary-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+/* Animations */
+@keyframes congoFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes congoCardSlide {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 480px) {
+  .congo-modal-card {
+    padding: 18px 16px 16px;
+    border-radius: 18px;
+  }
+
+  .congo-heading {
+    font-size: 1.45rem;
+  }
+
+  .congo-actions {
+    grid-template-columns: 1fr;
+  }
+}

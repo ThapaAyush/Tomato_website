@@ -2,10 +2,11 @@ import React, { useContext, useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { StoreContext } from '../../context/StoreContext';
+import { assets } from '../../assets/assets';
 import './Orders.css';
 
 const Orders = ({ setShowLogin }) => {
-  const { url, token } = useContext(StoreContext);
+  const { url, token, food_list } = useContext(StoreContext);
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,28 +49,40 @@ const Orders = ({ setShowLogin }) => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const cancelCustomerOrder = async (orderId) => {
-    if (window.confirm('Are you sure you want to cancel this order?')) {
-      try {
-        const response = await axios.post(`${url}/api/order/cancel`, { orderId });
-        if (response.data?.success) {
-          setOrders((prev) => prev.filter((order) => order._id !== orderId));
-          if (activeTrackingId === orderId) {
-            setActiveTrackingId(null);
-          }
-        } else {
-          alert(response.data?.message || 'Failed to cancel order');
-        }
-      } catch (error) {
-        console.error('Failed to cancel order:', error);
-        alert('Failed to cancel order. Please check your connection.');
-      }
-    }
-  };
-
   const toggleTracking = (orderId) => {
     setActiveTrackingId((prev) => (prev === orderId ? null : orderId));
     fetchOrders(true);
+  };
+
+  const getItemImageUrl = (item) => {
+    if (!item) return assets.parcel_icon;
+    let img = item.image;
+    if (!img && food_list) {
+      const match = food_list.find(
+        (f) =>
+          (item._id && f._id === item._id) ||
+          (f.name && item.name && f.name.toLowerCase() === item.name.toLowerCase())
+      );
+      if (match) {
+        img = match.image;
+      }
+    }
+    if (!img) return assets.parcel_icon;
+    if (typeof img === 'string') {
+      if (
+        img.startsWith('http://') ||
+        img.startsWith('https://') ||
+        img.startsWith('blob:') ||
+        img.startsWith('data:')
+      ) {
+        return img;
+      }
+      if (img.startsWith('/')) {
+        return `${url}${img}`;
+      }
+      return `${url}/images/${img}`;
+    }
+    return img;
   };
 
   const formatItemSummary = (items = []) => {
@@ -137,17 +150,38 @@ const Orders = ({ setShowLogin }) => {
           {orders.map((order) => {
             const currentStep = getStatusStep(order.status);
             const isTracking = activeTrackingId === order._id;
+            const firstItem = order.items?.[0];
+            const itemImageUrl = getItemImageUrl(firstItem);
 
             return (
               <div className='order-card-wrapper' key={order._id || order.date}>
                 <div className='order-card'>
-                  <div className='order-icon'>🧾</div>
+                  <div className='order-image-container'>
+                    <img
+                      src={itemImageUrl}
+                      alt={firstItem?.name || 'Food item'}
+                      className='order-item-img'
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = assets.parcel_icon;
+                      }}
+                    />
+                    {order.items?.length > 1 && (
+                      <span
+                        className='order-item-count-badge'
+                        title={`${order.items.length} items in this order`}
+                      >
+                        +{order.items.length - 1}
+                      </span>
+                    )}
+                  </div>
 
                   <div className='order-main'>
-                    <div className='order-header-info'>
-                      <span className='order-id-tag'>#{String(order._id || '').slice(-6).toUpperCase() || 'ORDER'}</span>
-                      {order.date && <span className='order-date'>{formatDate(order.date)}</span>}
-                    </div>
+                    {order.date && (
+                      <div className='order-header-info'>
+                        <span className='order-date'>{formatDate(order.date)}</span>
+                      </div>
+                    )}
 
                     <p className='order-items'>
                       {formatItemSummary(order.items || [])}
@@ -169,13 +203,6 @@ const Orders = ({ setShowLogin }) => {
                       onClick={() => toggleTracking(order._id)}
                     >
                       {isTracking ? 'Hide Tracking' : 'Track Order'}
-                    </button>
-                    <button
-                      type='button'
-                      className='order-cancel-btn'
-                      onClick={() => cancelCustomerOrder(order._id)}
-                    >
-                      Cancel
                     </button>
                   </div>
                 </div>

@@ -37,10 +37,16 @@ const App = () => {
 
   return (
     <>
-    {showLogin?<LoginPopup setShowLogin={setShowLogin}/>:<></>}
-      <div className='app'>
+      {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : <></>}
 
-        <Navbar setShowLogin={setShowLogin} />
+      {/* Fixed Sticky Navbar Header */}
+      <header className='navbar-sticky-header'>
+        <div className='navbar-inner-wrapper'>
+          <Navbar setShowLogin={setShowLogin} />
+        </div>
+      </header>
+
+      <div className='app'>
 
         <Routes>
           <Route path='/' element={<Home />} />

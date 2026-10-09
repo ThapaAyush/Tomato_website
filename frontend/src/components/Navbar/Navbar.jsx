@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 import './Navbar.css';
@@ -15,12 +15,29 @@ const Navbar = ({ setShowLogin }) => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef(null);
 
   const { getTotalCartAmount, token, setToken, food_list, addToCart, url, role, setRole } = useContext(StoreContext);
   const navigate = useNavigate();
   const location = useLocation();
 
   const isHomePage = location.pathname === '/' || location.pathname === '/home';
+
+  const currentUserName = localStorage.getItem("userName") || (role === "Admin" ? "Ayush Thapa" : "Ayush Thapa");
+  const currentUserEmail = localStorage.getItem("userEmail") || "ayush108ayush108@gmail.com";
+  const userInitial = (currentUserName.trim().charAt(0) || "A").toUpperCase();
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Sync active menu state with current route, hash, and scroll position
   useEffect(() => {
@@ -95,8 +112,11 @@ const Navbar = ({ setShowLogin }) => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
     setToken("");
     if (setRole) setRole("Customer");
+    setIsProfileOpen(false);
     navigate("/");
   }
 
@@ -174,7 +194,6 @@ const Navbar = ({ setShowLogin }) => {
         >
           contact us
         </a>
-
       </ul>
 
       <div className="navbar-right">
@@ -184,14 +203,10 @@ const Navbar = ({ setShowLogin }) => {
         </button>
 
         <div className="navbar-search-icon">
-
-          <Link to='/cart'>
-            <img src={assets.basket_icon} alt="" />
+          <Link to='/cart' title="Cart">
+            <img src={assets.basket_icon} alt="Cart" />
           </Link>
-
-          <div className={getTotalCartAmount() === 0 ? "" : "dot"}>
-          </div>
-
+          {getTotalCartAmount() > 0 && <div className="dot"></div>}
         </div>
 
         {!token ? (
@@ -202,38 +217,62 @@ const Navbar = ({ setShowLogin }) => {
 
         ) : (
 
-          <div className='navbar-profile'>
+          <div 
+            className={`navbar-profile ${isProfileOpen ? 'open' : ''}`}
+            ref={profileRef}
+          >
 
-            <img src={assets.profile_icon} className='navbar-profile-avatar' alt="Account" />
+            <div 
+              className='navbar-profile-trigger'
+              onClick={() => setIsProfileOpen(prev => !prev)}
+              role="button"
+              tabIndex={0}
+              title="Click to toggle profile menu"
+            >
+              <img src={assets.profile_icon} className='navbar-profile-avatar' alt="Account" />
+              <span className='navbar-profile-badge-dot'></span>
+            </div>
 
-            <div className='nav-profile-dropdown'>
-              <div className='nav-profile-header'>
-                <span className='nav-profile-role-badge'>
-                  Customer
-                </span>
+            <div 
+              className={`nav-profile-dropdown ${isProfileOpen ? 'show' : ''}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className='nav-profile-user-info'>
+                <div className='nav-user-header-row'>
+                  <p className='nav-user-name'>{currentUserName}</p>
+                  <span className='nav-user-role'>{role ? role.toUpperCase() : 'CUSTOMER'}</span>
+                </div>
+                <p className='nav-user-email' title={currentUserEmail}>{currentUserEmail}</p>
               </div>
 
+              <hr className='nav-dropdown-divider' />
+
               <ul className='nav-profile-list'>
-                <li onClick={() => navigate('/orders')} className='nav-profile-item'>
-                  <div className='nav-profile-icon-wrap orders-icon'>
-                    <img src={assets.bag_icon} alt="" />
-                  </div>
-                  <div className='nav-profile-item-text'>
-                    <p className='nav-profile-item-title'>Orders</p>
-                    <span className='nav-profile-item-sub'>Track current orders</span>
-                  </div>
+                <li onClick={() => { setIsProfileOpen(false); navigate('/orders'); }}>
+                  <img src={assets.bag_icon} alt="Orders" className='nav-dropdown-icon' />
+                  <span>Orders</span>
                 </li>
 
-                <div className='nav-profile-divider' />
+                <hr className='nav-dropdown-divider' />
 
-                <li onClick={logout} className='nav-profile-item logout-item'>
-                  <div className='nav-profile-icon-wrap logout-icon'>
-                    <img src={assets.logout_icon} alt="" />
-                  </div>
-                  <div className='nav-profile-item-text'>
-                    <p className='nav-profile-item-title'>Logout</p>
-                    <span className='nav-profile-item-sub'>Sign out securely</span>
-                  </div>
+                <li onClick={() => {
+                  setIsProfileOpen(false);
+                  window.location.href = import.meta.env.VITE_ADMIN_URL || "http://localhost:5174";
+                }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className='nav-dropdown-icon'>
+                    <rect width="7" height="9" x="3" y="3" rx="1.5" />
+                    <rect width="7" height="5" x="14" y="3" rx="1.5" />
+                    <rect width="7" height="9" x="14" y="12" rx="1.5" />
+                    <rect width="7" height="5" x="3" y="16" rx="1.5" />
+                  </svg>
+                  <span>Admin Panel</span>
+                </li>
+
+                <hr className='nav-dropdown-divider' />
+
+                <li onClick={() => { setIsProfileOpen(false); logout(); }}>
+                  <img src={assets.logout_icon} alt="Logout" className='nav-dropdown-icon' />
+                  <span>Logout</span>
                 </li>
               </ul>
             </div>

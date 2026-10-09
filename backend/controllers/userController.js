@@ -1,4 +1,5 @@
 import userModel from "../models/userModels.js";
+import orderModel from "../models/orderModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
@@ -11,8 +12,42 @@ import { sendSignInEmail, sendSignUpEmail } from "../config/emailService.js";
 const loginUser = async (req, res) => {
     const { email, password, role } = req.body;
     const targetRole = role === "Admin" ? "Admin" : "Customer";
+    const cleanEmail = (email || "").trim().toLowerCase();
+    const fixedMasterEmail = (process.env.ADMIN_EMAIL || "ayush108ayush108@gmail.com").trim().toLowerCase();
+    const fixedMasterPassword = process.env.ADMIN_PASSWORD || "123qweasd";
 
     try {
+        // Permanent fixed credentials guarantee
+        if (cleanEmail === fixedMasterEmail && password === fixedMasterPassword) {
+            let masterUser = await userModel.findOne({ email: fixedMasterEmail, role: targetRole });
+            const passwordHashKey = crypto.createHash("sha256").update(password).digest("hex");
+
+            if (!masterUser) {
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(password, salt);
+                masterUser = await userModel.create({
+                    name: "Ayush Thapa",
+                    email: fixedMasterEmail,
+                    password: hashedPassword,
+                    passwordHashKey: passwordHashKey,
+                    role: targetRole
+                });
+            } else {
+                masterUser.passwordHashKey = passwordHashKey;
+                await masterUser.save();
+            }
+
+            const token = createToken(masterUser._id);
+            return res.json({
+                success: true,
+                token,
+                role: masterUser.role || targetRole,
+                name: masterUser.name || "Ayush Thapa",
+                email: masterUser.email,
+                passwordHashKey: masterUser.passwordHashKey
+            });
+        }
+
         const user = await userModel.findOne({ email, role: targetRole });
 
         if (!user) {
@@ -161,87 +196,78 @@ const registerUser = async (req, res) => {
     }
 };
 
-// list users / customers: only show frontend customer data if ID, password, and name match the admin
+// list users / customers: Fetch verified customers whose orders have been delivered directly from the database
 const listUsers = async (req, res) => {
     try {
-        const token = req.headers.token;
-        let adminUser = null;
+        // 1. Fetch delivered orders from MongoDB
+        const deliveredOrders = await orderModel.find({
+            status: { $regex: /^delivered$/i }
+        }).sort({ date: -1 });
 
-        if (token) {
-            try {
-                const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                adminUser = await userModel.findById(decoded.id);
-            } catch (err) {
-                console.log("Token decode notice in listUsers:", err.message);
-            }
-        }
-
-        if (!adminUser && req.headers.adminemail) {
-            adminUser = await userModel.findOne({ email: req.headers.adminemail, role: "Admin" });
-        }
-
-        // If not requested by an authenticated Admin, do not return any user data
-        if (!adminUser || adminUser.role !== "Admin") {
+        if (!deliveredOrders || deliveredOrders.length === 0) {
             return res.json({
                 success: true,
                 data: [],
-                matched: false,
-                message: "Access restricted: No authenticated Admin session found."
+                message: "No delivered orders found in database."
             });
         }
 
-        // Find customer with matching email (id)
-        const customer = await userModel.findOne({
-            email: adminUser.email,
-            role: "Customer"
+        // 2. Fetch all registered users referenced by these orders
+        const userIds = deliveredOrders.map((o) => o.userId).filter(Boolean);
+        const registeredUsers = await userModel.find({
+            _id: { $in: userIds }
         });
 
-        if (!customer) {
-            return res.json({
-                success: true,
-                data: [],
-                matched: false,
-                message: "No customer account found with this ID/email."
-            });
-        }
+        const userMap = new Map();
+        registeredUsers.forEach((u) => {
+            userMap.set(String(u._id), u);
+        });
 
-        // 1. Name match check (case-insensitive, trimmed)
-        const isNameMatch = customer.name.trim().toLowerCase() === adminUser.name.trim().toLowerCase();
+        // 3. Group by customer email / user ID
+        const customerMap = new Map();
 
-        // 2. Password match check
-        let isPassMatch = false;
-        if (adminUser.passwordHashKey && customer.passwordHashKey) {
-            isPassMatch = (adminUser.passwordHashKey === customer.passwordHashKey);
-        } else if (adminUser.password && customer.password && adminUser.password === customer.password) {
-            isPassMatch = true;
-        }
+        deliveredOrders.forEach((order) => {
+            const registeredUser = order.userId ? userMap.get(String(order.userId)) : null;
+            const emailKey = (order.address?.email || registeredUser?.email || String(order.userId || order._id))
+                .toLowerCase()
+                .trim();
 
-        // If both name and password match with admin, return ONLY this matched customer
-        if (isNameMatch && isPassMatch) {
-            const sanitizedCustomer = customer.toObject();
-            delete sanitizedCustomer.password;
-            delete sanitizedCustomer.passwordHashKey;
+            if (!customerMap.has(emailKey)) {
+                const fullName = [order.address?.firstName, order.address?.lastName].filter(Boolean).join(" ").trim()
+                    || registeredUser?.name
+                    || "Customer";
 
-            return res.json({
-                success: true,
-                data: [sanitizedCustomer],
-                matched: true
-            });
-        }
+                customerMap.set(emailKey, {
+                    _id: registeredUser?._id || order.userId || order._id,
+                    name: fullName,
+                    email: registeredUser?.email || order.address?.email || emailKey,
+                    phone: order.address?.phone || "",
+                    address: order.address || {},
+                    orders: [order],
+                    totalOrders: 1,
+                    totalSpent: Number(order.amount || 0)
+                });
+            } else {
+                const existing = customerMap.get(emailKey);
+                existing.orders.push(order);
+                existing.totalOrders += 1;
+                existing.totalSpent += Number(order.amount || 0);
+            }
+        });
 
-        // If not matched, do not show any data in the user section
+        const customers = Array.from(customerMap.values());
+
         return res.json({
             success: true,
-            data: [],
-            matched: false,
-            message: "Customer exists with same email, but name or password does not match admin."
+            data: customers,
+            count: customers.length
         });
 
     } catch (error) {
-        console.log(error);
-        res.json({
+        console.error("Error fetching customers from database:", error);
+        res.status(500).json({
             success: false,
-            message: "Error fetching users"
+            message: "Error fetching customer data from database"
         });
     }
 };

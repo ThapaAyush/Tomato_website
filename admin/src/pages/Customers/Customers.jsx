@@ -12,25 +12,21 @@ const Customers = ({ url }) => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const token = localStorage.getItem("token") || ""
-        const adminEmail = localStorage.getItem("userEmail") || ""
-        const [usersRes, ordersRes] = await Promise.all([
-          axios.get(`${url}/api/user/list`, {
-            headers: {
-              token: token,
-              adminemail: adminEmail
-            }
-          }),
+        const [usersRes, ordersRes] = await Promise.allSettled([
+          axios.get(`${url}/api/user/list`),
           axios.get(`${url}/api/order/list`)
         ])
 
-        if (usersRes.data?.success) {
-          setUsers(usersRes.data.data || [])
+        if (usersRes.status === 'fulfilled' && usersRes.value?.data?.success) {
+          setUsers(usersRes.value.data.data || [])
         } else {
           setUsers([])
         }
-        if (ordersRes.data?.success) {
-          setOrders(ordersRes.data.data || [])
+
+        if (ordersRes.status === 'fulfilled' && ordersRes.value?.data?.success) {
+          setOrders(ordersRes.value.data.data || [])
+        } else {
+          setOrders([])
         }
       } catch (error) {
         console.error('Failed to fetch customers/orders:', error)
@@ -58,42 +54,70 @@ const Customers = ({ url }) => {
     return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`
   }
 
-  // Map orders to customers (strictly for matched users)
+  // Map orders to customers (strictly for delivered orders from the database)
   const customersWithOrders = useMemo(() => {
-    // If no matching customer returned by backend, do NOT show any customer data
-    if (!users || users.length === 0) {
-      return []
-    }
-
     const customerMap = new Map()
 
-    users.forEach((u) => {
-      customerMap.set(u.email.toLowerCase(), {
-        id: u._id,
-        name: u.name,
-        email: u.email,
-        allOrders: []
-      })
-    })
+    // 1. Populate from users returned by backend listUsers (delivered orders from DB)
+    if (Array.isArray(users)) {
+      users.forEach((u) => {
+        const emailKey = (u.email || '').toLowerCase().trim()
+        if (!emailKey) return
 
-    // Attach ONLY orders that belong to the matched customer(s)
-    orders.forEach((order) => {
-      if (order.status === 'Cancelled') return
-      const orderEmail = (order.address?.email || '').toLowerCase()
-      if (orderEmail && customerMap.has(orderEmail)) {
-        customerMap.get(orderEmail).allOrders.push(order)
-      } else {
-        // Fallback match by userId
-        for (const customer of customerMap.values()) {
-          if (customer.id && String(customer.id) === String(order.userId)) {
-            customer.allOrders.push(order)
-            break
+        customerMap.set(emailKey, {
+          id: u._id,
+          name: u.name || 'Customer',
+          email: u.email,
+          phone: u.phone || u.address?.phone || '',
+          allOrders: Array.isArray(u.orders) ? [...u.orders] : []
+        })
+      })
+    }
+
+    // 2. Cross-reference with all orders from database to ensure all delivered orders are counted
+    if (Array.isArray(orders)) {
+      orders.forEach((order) => {
+        const status = (order.status || '').toLowerCase().trim()
+        if (status !== 'delivered') return // Only delivered orders qualify as completed customer purchases
+
+        const orderEmail = (order.address?.email || '').toLowerCase().trim()
+        const fullName = [order.address?.firstName, order.address?.lastName]
+          .filter(Boolean)
+          .join(' ')
+          .trim() || 'Customer'
+
+        const key = orderEmail || String(order.userId || order._id)
+
+        if (!customerMap.has(key)) {
+          customerMap.set(key, {
+            id: order.userId || order._id,
+            name: fullName,
+            email: order.address?.email || 'customer@example.com',
+            phone: order.address?.phone || '',
+            allOrders: [order]
+          })
+        } else {
+          const cust = customerMap.get(key)
+          const alreadyExists = cust.allOrders.some(
+            (o) => String(o._id) === String(order._id)
+          )
+          if (!alreadyExists) {
+            cust.allOrders.push(order)
+          }
+          if (!cust.phone && order.address?.phone) {
+            cust.phone = order.address.phone
+          }
+          if (cust.name === 'Customer' && fullName !== 'Customer') {
+            cust.name = fullName
           }
         }
-      }
-    })
+      })
+    }
 
-    return Array.from(customerMap.values())
+    // Filter to customers who actually have delivered orders
+    return Array.from(customerMap.values()).filter(
+      (c) => c.allOrders && c.allOrders.length > 0
+    )
   }, [users, orders])
 
   // Filter orders according to date picker
@@ -134,7 +158,7 @@ const Customers = ({ url }) => {
           <p className='customers-kicker'>CUSTOMER ACTIVITY</p>
           <h1 className='customers-title'>Customers</h1>
           <p className='customers-subtitle'>
-            Review customers and the orders placed by each one.
+            Review verified customers with delivered food orders.
           </p>
         </div>
 
@@ -190,9 +214,9 @@ const Customers = ({ url }) => {
           </div>
         ) : processedCustomers.length === 0 ? (
           <div className='customers-empty'>
-            <p>No matching customer data found.</p>
-            <span style={{ fontSize: '13px', color: '#888', marginTop: '6px', display: 'block', maxWidth: '460px', margin: '6px auto 0', lineHeight: '1.4' }}>
-              Customer data is displayed here only when your Admin credentials (ID/email, name, and password) match a registered Frontend Customer account.
+            <p>No delivered customer orders found.</p>
+            <span style={{ fontSize: '13.5px', color: '#777', marginTop: '6px', display: 'block', maxWidth: '480px', margin: '6px auto 0', lineHeight: '1.4' }}>
+              When an order is marked as "delivered" in the Orders section, that customer and their completed order details will appear here.
             </span>
           </div>
         ) : (
@@ -203,16 +227,18 @@ const Customers = ({ url }) => {
                 <div className='customer-card-header'>
                   <div className='customer-info'>
                     <h3 className='customer-name'>{customer.name}</h3>
-                    <p className='customer-email'>{customer.email}</p>
+                    <p className='customer-email'>
+                      {customer.email}{customer.phone ? ` • ${customer.phone}` : ''}
+                    </p>
                   </div>
                   <div className='customer-order-count'>
-                    {count} {count === 1 ? 'order' : 'orders'}
+                    {count} {count === 1 ? 'delivered order' : 'delivered orders'}
                   </div>
                 </div>
 
                 <div className='customer-card-body'>
                   {count === 0 ? (
-                    <p className='no-orders-message'>No orders in this view.</p>
+                    <p className='no-orders-message'>No delivered orders on this selected date.</p>
                   ) : (
                     <div className='customer-orders'>
                       {customer.displayedOrders.map((order) => (
@@ -223,7 +249,8 @@ const Customers = ({ url }) => {
                             </p>
                             <p className='order-meta'>
                               {formatDateDisplay(order.date)} &bull;{' '}
-                              {order.status || 'Food Processing'}
+                              <span className='order-status-tag'>Delivered</span>
+                              {order.address?.city ? ` &bull; 📍 ${order.address.city}, ${order.address.state || ''}` : ''}
                             </p>
                           </div>
                           <div className='order-row-right'>

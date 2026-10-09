@@ -37,7 +37,9 @@ const LoginPopup = ({ setShowLogin }) => {
         localStorage.setItem("token", response.data.token);
         if (setRole) setRole("Customer");
         localStorage.setItem("role", "Customer");
-        if (data.email) localStorage.setItem("userEmail", data.email);
+        if (response.data.email || data.email) {
+          localStorage.setItem("userEmail", response.data.email || data.email);
+        }
         if (response.data.name || data.name) {
           localStorage.setItem("userName", response.data.name || data.name);
         }

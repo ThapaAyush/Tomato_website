@@ -114,7 +114,10 @@ const PlaceOrder = ({ setShowLogin }) => {
     });
   };
 
-  const finalizeOrderSuccess = (message = "Order placed successfully!") => {
+  const [orderSuccessData, setOrderSuccessData] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleOrderSuccess = (orderInfo) => {
     if (typeof clearCart === "function") {
       clearCart();
     } else if (typeof setCartItems === "function") {
@@ -125,18 +128,19 @@ const PlaceOrder = ({ setShowLogin }) => {
     } catch (e) {
       console.warn("Could not clear saved cart:", e);
     }
-    alert(message);
-    navigate("/orders");
+    setErrorMessage("");
+    setOrderSuccessData(orderInfo);
   };
 
   // Place order
   const placeOrder = async (event) => {
     event.preventDefault();
+    setErrorMessage("");
 
     const activeToken = token || localStorage.getItem("token");
 
     if (!activeToken) {
-      alert("Please login first to continue with checkout");
+      setErrorMessage("Please sign in first to continue with checkout");
       if (setShowLogin) setShowLogin(true);
       return;
     }
@@ -145,7 +149,7 @@ const PlaceOrder = ({ setShowLogin }) => {
 
     // Check cart
     if (totalAmount === 0) {
-      alert("Your cart is empty");
+      setErrorMessage("Your cart is empty. Add items from the menu to proceed.");
       navigate("/cart");
       return;
     }
@@ -159,7 +163,7 @@ const PlaceOrder = ({ setShowLogin }) => {
       }));
 
     if (orderItems.length === 0) {
-      alert("Your cart is empty");
+      setErrorMessage("Your cart is empty. Add items from the menu to proceed.");
       navigate("/cart");
       return;
     }
@@ -169,7 +173,7 @@ const PlaceOrder = ({ setShowLogin }) => {
 
       const fullPhone = `${countryCode} ${phoneDigits.trim()}`.trim();
       if (!phoneDigits.trim()) {
-        alert("Please enter your phone number");
+        setErrorMessage("Please enter your phone number to receive delivery updates.");
         setSubmitting(false);
         return;
       }
@@ -201,14 +205,24 @@ const PlaceOrder = ({ setShowLogin }) => {
 
       // Check backend response
       if (!response.data?.success) {
-        alert(response.data?.message || "Unable to create order. Please try again.");
+        setErrorMessage(response.data?.message || "Unable to create order. Please try again.");
         setSubmitting(false);
         return;
       }
 
       // If Cash on Delivery or fallback
       if (paymentMethod === "cod" || response.data?.paymentMethod === "cod") {
-        finalizeOrderSuccess(response.data?.message || "Order placed successfully with Cash on Delivery!");
+        handleOrderSuccess({
+          orderId: response.data?.orderId || `ORD-${Date.now().toString().slice(-6)}`,
+          paymentMethod: "cod",
+          amount: payableAmount,
+          items: orderItems,
+          address: {
+            ...data,
+            phone: fullPhone,
+          },
+          placedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        });
         return;
       }
 
@@ -216,8 +230,18 @@ const PlaceOrder = ({ setShowLogin }) => {
       const razorpayLoaded = await loadRazorpayScript();
 
       if (!razorpayLoaded) {
-        alert("Payment gateway script could not be loaded. Your order was placed as Cash on Delivery.");
-        finalizeOrderSuccess("Order placed successfully with Cash on Delivery!");
+        handleOrderSuccess({
+          orderId: response.data?.orderId || `ORD-${Date.now().toString().slice(-6)}`,
+          paymentMethod: "cod",
+          amount: payableAmount,
+          items: orderItems,
+          address: {
+            ...data,
+            phone: fullPhone,
+          },
+          note: "Payment gateway script could not load. Order confirmed with Cash on Delivery!",
+          placedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        });
         return;
       }
 
@@ -225,7 +249,17 @@ const PlaceOrder = ({ setShowLogin }) => {
 
       if (!key || !order || !order.id) {
         // Safe fallback
-        finalizeOrderSuccess("Order placed successfully!");
+        handleOrderSuccess({
+          orderId: response.data?.orderId || `ORD-${Date.now().toString().slice(-6)}`,
+          paymentMethod: "cod",
+          amount: payableAmount,
+          items: orderItems,
+          address: {
+            ...data,
+            phone: fullPhone,
+          },
+          placedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        });
         return;
       }
 
@@ -236,8 +270,19 @@ const PlaceOrder = ({ setShowLogin }) => {
         name: "Tomato.",
         description: "Food order payment",
         order_id: order.id,
-        handler: function () {
-          finalizeOrderSuccess("Payment successful! Your order has been placed.");
+        handler: function (razorpayResponse) {
+          handleOrderSuccess({
+            orderId: response.data?.orderId || razorpayResponse?.razorpay_order_id || `ORD-${Date.now().toString().slice(-6)}`,
+            paymentId: razorpayResponse?.razorpay_payment_id,
+            paymentMethod: "razorpay",
+            amount: payableAmount,
+            items: orderItems,
+            address: {
+              ...data,
+              phone: fullPhone,
+            },
+            placedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          });
         },
         prefill: {
           name: `${data.firstName} ${data.lastName}`.trim(),
@@ -249,8 +294,18 @@ const PlaceOrder = ({ setShowLogin }) => {
         },
         modal: {
           ondismiss: function () {
-            alert("Payment window closed. You can track your order in My Orders.");
-            finalizeOrderSuccess("Order placed! Tracking available in My Orders.");
+            handleOrderSuccess({
+              orderId: response.data?.orderId || `ORD-${Date.now().toString().slice(-6)}`,
+              paymentMethod: "cod",
+              amount: payableAmount,
+              items: orderItems,
+              address: {
+                ...data,
+                phone: fullPhone,
+              },
+              note: "Payment window was closed. Order confirmed with Cash on Delivery!",
+              placedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            });
           },
         },
       };
@@ -259,30 +314,42 @@ const PlaceOrder = ({ setShowLogin }) => {
 
       razorpay.on("payment.failed", function (failResponse) {
         console.error("Payment failed:", failResponse.error);
-        alert(failResponse.error?.description || "Payment failed. Order saved for offline processing.");
-        finalizeOrderSuccess("Order created. Please pay cash upon arrival.");
+        handleOrderSuccess({
+          orderId: response.data?.orderId || `ORD-${Date.now().toString().slice(-6)}`,
+          paymentMethod: "cod",
+          amount: payableAmount,
+          items: orderItems,
+          address: {
+            ...data,
+            phone: fullPhone,
+          },
+          note: "Payment failed. Order saved with Cash on Delivery!",
+          placedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        });
       });
 
       razorpay.open();
     } catch (error) {
       console.error("Place order error:", error);
       const errMsg = error.response?.data?.message || "Server error while placing order. Please try again.";
-      alert(errMsg);
+      setErrorMessage(errMsg);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Redirect if cart is empty on mount
+  // Redirect if cart is empty on mount (only when not showing the congratulations modal)
   useEffect(() => {
+    if (orderSuccessData) return;
     const total = getTotalCartAmount();
     if (total === 0 && (!cartItems || Object.keys(cartItems).length === 0)) {
       navigate("/cart");
     }
-  }, [getTotalCartAmount, cartItems, navigate]);
+  }, [getTotalCartAmount, cartItems, navigate, orderSuccessData]);
 
   return (
-    <form className="place-order" onSubmit={placeOrder}>
+    <>
+      <form className="place-order" onSubmit={placeOrder}>
       {/* LEFT SIDE - DELIVERY DETAILS */}
       <div className="place-order-left">
         <h2 className="title">Delivery Details</h2>
@@ -543,6 +610,22 @@ const PlaceOrder = ({ setShowLogin }) => {
             </div>
           </div>
 
+          {/* Error banner without native browser alert */}
+          {errorMessage && (
+            <div className="place-order-error-banner" role="alert">
+              <span className="error-icon">⚠️</span>
+              <p className="error-text">{errorMessage}</p>
+              <button
+                type="button"
+                className="clear-error-btn"
+                onClick={() => setErrorMessage("")}
+                title="Dismiss message"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
           {/* Submit button */}
           <button type="submit" disabled={submitting}>
             {submitting
@@ -554,6 +637,115 @@ const PlaceOrder = ({ setShowLogin }) => {
         </div>
       </div>
     </form>
+
+    {/* BIG CONGO (CONGRATULATIONS) CELEBRATION MODAL */}
+    {orderSuccessData && (
+      <div className="congo-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="congo-title">
+        <div className="congo-modal-card">
+          {/* Confetti floating decorations */}
+          <div className="congo-confetti-wrap" aria-hidden="true">
+            <span className="congo-confetti c1">🎉</span>
+            <span className="congo-confetti c2">✨</span>
+            <span className="congo-confetti c3">🎊</span>
+            <span className="congo-confetti c4">🍕</span>
+            <span className="congo-confetti c6">✨</span>
+            <span className="congo-confetti c7">🎉</span>
+          </div>
+
+          <button
+            type="button"
+            className="congo-modal-close"
+            onClick={() => navigate("/orders")}
+            title="Close"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+
+          {/* Animated checkmark badge */}
+          <div className="congo-badge-wrapper">
+            <div className="congo-badge-glow"></div>
+            <div className="congo-badge-icon">
+              <svg viewBox="0 0 52 52" className="congo-svg-check">
+                <circle className="congo-svg-circle" cx="26" cy="26" r="23" fill="none" />
+                <path className="congo-svg-path" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Title & short subtitle */}
+          <h2 id="congo-title" className="congo-heading">
+            Congratulations! 🎉
+          </h2>
+          <p className="congo-lead">
+            Your order is confirmed & being prepared fresh.
+          </p>
+
+          {/* Compact Receipt Box */}
+          <div className="congo-order-receipt">
+            <div className="congo-receipt-row">
+              <span className="order-id-tag">
+                Order <strong>#{String(orderSuccessData.orderId || "TOMATO").slice(-8).toUpperCase()}</strong>
+              </span>
+              <span className="eta-tag">
+                ⏱️ 30–40 mins
+              </span>
+            </div>
+
+            <div className="congo-receipt-row payment-amount-row">
+              <div className="payment-mode-pill">
+                {orderSuccessData.paymentMethod === "cod" ? (
+                  <span>💵 Cash on Delivery</span>
+                ) : (
+                  <span>💳 Online Paid</span>
+                )}
+              </div>
+              <div className="total-amount-pill">
+                Total: <strong>₹{orderSuccessData.amount}</strong>
+              </div>
+            </div>
+
+            {orderSuccessData.address && (
+              <div className="congo-address-row">
+                <span className="address-icon">📍</span>
+                <span className="address-line">
+                  {orderSuccessData.address.firstName} {orderSuccessData.address.lastName} &bull; {[orderSuccessData.address.street, orderSuccessData.address.city].filter(Boolean).join(", ")}
+                </span>
+              </div>
+            )}
+
+            {orderSuccessData.items && orderSuccessData.items.length > 0 && (
+              <div className="congo-items-row">
+                {orderSuccessData.items.map((it, idx) => (
+                  <span key={idx} className="item-chip">
+                    {it.name} <strong>x{it.quantity || 1}</strong>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Action buttons (side-by-side row) */}
+          <div className="congo-actions">
+            <button
+              type="button"
+              className="congo-primary-btn"
+              onClick={() => navigate("/orders")}
+            >
+              🛵 Track Order
+            </button>
+            <button
+              type="button"
+              className="congo-secondary-btn"
+              onClick={() => navigate("/")}
+            >
+              Order More
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </>
   );
 };
 

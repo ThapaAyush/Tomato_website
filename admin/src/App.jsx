@@ -91,7 +91,7 @@ const App = () => {
         <Login url={url} onLoginSuccess={handleLoginSuccess} />
       ) : (
         <>
-          <Navbar />
+          <Navbar onLogout={handleLogout} />
           <hr />
           <div className="app-content">
             <Sidebar />

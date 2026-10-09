@@ -45,11 +45,7 @@ const Login = ({ url, onLoginSuccess }) => {
           localStorage.setItem('passwordHashKey', response.data.passwordHashKey)
         }
 
-        toast.success(
-          currState === 'Login'
-            ? 'Welcome back to Admin Portal'
-            : 'Admin account created successfully'
-        )
+        toast.success(currState === 'Login' ? 'Logged in successfully' : 'Admin account created')
 
         if (onLoginSuccess) {
           onLoginSuccess({ token, role, email, name })
@@ -58,137 +54,74 @@ const Login = ({ url, onLoginSuccess }) => {
         toast.error(response.data.message || 'Authentication failed')
       }
     } catch (error) {
-      const msg =
-        error.response?.data?.message ||
-        'Unable to connect to the server. Please check that backend is running.'
+      const msg = error.response?.data?.message || 'Unable to connect to server.'
       toast.error(msg)
     } finally {
       setLoading(false)
     }
   }
 
+  const frontendUrl = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
+
   return (
-    <div className='admin-auth-page'>
-      <div className='admin-auth-card'>
-        <div className='admin-auth-header'>
-          <div className='admin-auth-brand'>
-            <img src={assets.logo} alt='Tomato Logo' className='admin-auth-logo' />
-            <span className='admin-auth-badge'>Admin Portal</span>
-          </div>
-          <h2 className='admin-auth-title'>
-            {currState === 'Login' ? 'Administrator Login' : 'Register Admin'}
-          </h2>
-          <p className='admin-auth-subtitle'>
-            {currState === 'Login'
-              ? 'Enter your credentials to access the management dashboard'
-              : 'Create a new administrator account with full control'}
-          </p>
+    <div className='login-page'>
+      <form onSubmit={handleSubmit} className='login-box'>
+        <div className='login-header'>
+          <img src={assets.logo} alt="Tomato Logo" className='login-logo' />
+          <h2>Admin {currState}</h2>
         </div>
 
-        <div className='admin-auth-security-notice'>
-          <svg
-            width='16'
-            height='16'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2.2'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          >
-            <rect x='3' y='11' width='18' height='11' rx='2' ry='2'></rect>
-            <path d='M7 11V7a5 5 0 0 1 10 0v4'></path>
-          </svg>
-          <span>Restricted Portal: Admin credentials required</span>
-        </div>
-
-        <form onSubmit={handleSubmit} className='admin-auth-form'>
+        <div className='login-inputs'>
           {currState === 'Sign Up' && (
-            <div className='admin-form-group'>
-              <label htmlFor='admin-name'>Admin Full Name</label>
-              <input
-                id='admin-name'
-                name='name'
-                type='text'
-                value={data.name}
-                onChange={onChangeHandler}
-                placeholder='e.g. Ayush Admin'
-                required
-                autoComplete='name'
-              />
-            </div>
+            <input
+              name='name'
+              type='text'
+              value={data.name}
+              onChange={onChangeHandler}
+              placeholder='Your name'
+              required
+            />
           )}
 
-          <div className='admin-form-group'>
-            <label htmlFor='admin-email'>Admin Email</label>
-            <input
-              id='admin-email'
-              name='email'
-              type='email'
-              value={data.email}
-              onChange={onChangeHandler}
-              placeholder='admin@example.com'
-              required
-              autoComplete='email'
-            />
-          </div>
+          <input
+            name='email'
+            type='email'
+            value={data.email}
+            onChange={onChangeHandler}
+            placeholder='Your email'
+            required
+          />
 
-          <div className='admin-form-group'>
-            <label htmlFor='admin-password'>Password</label>
-            <input
-              id='admin-password'
-              name='password'
-              type='password'
-              value={data.password}
-              onChange={onChangeHandler}
-              placeholder='Enter password (min 8 chars)'
-              required
-              minLength={8}
-              autoComplete={currState === 'Login' ? 'current-password' : 'new-password'}
-            />
-          </div>
+          <input
+            name='password'
+            type='password'
+            value={data.password}
+            onChange={onChangeHandler}
+            placeholder='Password'
+            required
+            minLength={6}
+          />
+        </div>
 
-          <button
-            type='submit'
-            className='admin-auth-submit-btn'
-            disabled={loading}
-          >
-            {loading ? (
-              <span className='admin-spinner'>Authenticating...</span>
-            ) : currState === 'Login' ? (
-              'Sign In as Admin'
-            ) : (
-              'Create Admin Account'
-            )}
-          </button>
-        </form>
+        <button type='submit' disabled={loading}>
+          {loading ? 'Please wait...' : currState === 'Login' ? 'Login' : 'Sign Up'}
+        </button>
 
-        <div className='admin-auth-footer'>
+        <div className='login-footer'>
           {currState === 'Login' ? (
             <p>
-              Need a new Admin account?{' '}
-              <button
-                type='button'
-                className='admin-auth-switch-btn'
-                onClick={() => setCurrState('Sign Up')}
-              >
-                Sign up as Admin
-              </button>
+              Don't have an admin account?{' '}
+              <span onClick={() => setCurrState('Sign Up')}>Sign up</span>
             </p>
           ) : (
             <p>
-              Already have an Admin account?{' '}
-              <button
-                type='button'
-                className='admin-auth-switch-btn'
-                onClick={() => setCurrState('Login')}
-              >
-                Sign in
-              </button>
+              Already have an admin account?{' '}
+              <span onClick={() => setCurrState('Login')}>Login here</span>
             </p>
           )}
+          <a href={frontendUrl} className='login-back-link'>← Back to Website</a>
         </div>
-      </div>
+      </form>
     </div>
   )
 }

@@ -10,6 +10,9 @@ import userRouter from "./routes/userRoutes.js";
 import cartRouter from "./routes/cartRoutes.js";
 import orderRouter from "./routes/orderRoute.js";
 import foodModel from "./models/foodModel.js";
+import userModel from "./models/userModels.js";
+import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,18 +27,8 @@ if (!fs.existsSync(uploadsDir)) {
 const app = express();
 const port = process.env.PORT || 4000;
 
-// CORS configuration (supports Render, Vercel, localhost)
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",").map((origin) => origin.trim())
-  : "*";
-
-app.use(
-  cors({
-    origin: allowedOrigins === "*" ? "*" : allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "token", "Authorization"],
-  })
-);
+// CORS configuration (supports all origins, methods, and headers)
+app.use(cors());
 
 // middleware
 app.use(express.json());
@@ -109,6 +102,54 @@ async function seedDefaultFoods() {
   }
 }
 
+async function seedFixedAdminUser() {
+  try {
+    const fixedEmail = (process.env.ADMIN_EMAIL || "ayush108ayush108@gmail.com").trim().toLowerCase();
+    const fixedPassword = process.env.ADMIN_PASSWORD || "123qweasd";
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(fixedPassword, salt);
+    const passwordHashKey = crypto.createHash("sha256").update(fixedPassword).digest("hex");
+
+    // Ensure Admin account is permanently present with exact credentials
+    let admin = await userModel.findOne({ email: fixedEmail, role: "Admin" });
+    if (!admin) {
+      await userModel.create({
+        name: "Ayush Thapa",
+        email: fixedEmail,
+        password: hashedPassword,
+        passwordHashKey,
+        role: "Admin",
+      });
+      console.log("Fixed Admin user created permanently:", fixedEmail);
+    } else {
+      admin.password = hashedPassword;
+      admin.passwordHashKey = passwordHashKey;
+      await admin.save();
+      console.log("Fixed Admin credentials verified and synchronized permanently:", fixedEmail);
+    }
+
+    // Ensure Customer account is permanently present with exact credentials
+    let customer = await userModel.findOne({ email: fixedEmail, role: "Customer" });
+    if (!customer) {
+      await userModel.create({
+        name: "Ayush Thapa",
+        email: fixedEmail,
+        password: hashedPassword,
+        passwordHashKey,
+        role: "Customer",
+      });
+      console.log("Fixed Customer user created permanently:", fixedEmail);
+    } else {
+      customer.password = hashedPassword;
+      customer.passwordHashKey = passwordHashKey;
+      await customer.save();
+      console.log("Fixed Customer credentials verified and synchronized permanently:", fixedEmail);
+    }
+  } catch (error) {
+    console.error("Failed to seed fixed admin/customer user:", error);
+  }
+}
+
 // Global error handling middleware
 app.use((err, req, res, next) => {
   console.error("Server Error:", err.stack || err);
@@ -123,6 +164,7 @@ let server;
 connectDB()
   .then(async () => {
     await seedDefaultFoods();
+    await seedFixedAdminUser();
     server = app.listen(port, "0.0.0.0", () => {
       console.log(`Server Started on port ${port} (http://0.0.0.0:${port})`);
     });
