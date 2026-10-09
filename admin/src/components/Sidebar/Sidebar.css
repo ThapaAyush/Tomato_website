@@ -1,31 +1,392 @@
-.sidebar{
-    width: 18%;
-    min-height: 100vh;
-    border: 1.5px solid #a9a9a9;
-    border-top: 0;
-    font-size: max(1vw, 10px);
-}
-.sidebar-options{
-    padding-top: 50%;
-    padding-left: 20%;
+.admin-sidebar {
+    width: 260px;
+    min-width: 260px;
+    flex-shrink: 0;
+    min-height: calc(100vh - 72px);
+    background: #ffffff;
+    border-right: 1px solid #edf0f4;
+    padding: 24px 14px 20px 14px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    justify-content: space-between;
+    box-sizing: border-box;
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.sidebar-option{
+
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Section Header */
+.sidebar-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px 4px 8px;
+}
+
+.section-kicker {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #94a3b8;
+}
+
+.section-pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: #64748b;
+    letter-spacing: 0.3px;
+}
+
+/* Navigation options list */
+.sidebar-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Individual option card */
+.sidebar-option {
     display: flex;
     align-items: center;
     gap: 12px;
-    border: 1px solid #a9a9a9;
-    border-right: 0;
-    padding: 8px 10px;
-    border-radius: 3px 0px 0px 3px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: #475569;
+    position: relative;
+    border: 1px solid transparent;
+    background: transparent;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
+    overflow: hidden;
 }
+
+.sidebar-option:hover {
+    background: #f8fafc;
+    color: #1e293b;
+    transform: translateX(3px);
+}
+
+/* Icon Container */
+.sidebar-icon-wrap {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Individual theme tints for default state */
+.add-opt .sidebar-icon-wrap {
+    background: #fff4f0;
+    color: #ff5722;
+    border: 1px solid rgba(255, 87, 34, 0.16);
+}
+
+.list-opt .sidebar-icon-wrap {
+    background: #eff6ff;
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.16);
+}
+
+.orders-opt .sidebar-icon-wrap {
+    background: #ecfdf5;
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.16);
+}
+
+.customers-opt .sidebar-icon-wrap {
+    background: #f5f3ff;
+    color: #8b5cf6;
+    border: 1px solid rgba(139, 92, 246, 0.16);
+}
+
+.sidebar-option:hover .sidebar-icon-wrap {
+    transform: scale(1.08);
+}
+
+/* Text & typography */
+.sidebar-text-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.sidebar-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.25;
+    transition: color 0.18s ease;
+}
+
+.sidebar-subtitle {
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* Active indicator pill (left edge) */
+.sidebar-active-indicator {
+    position: absolute;
+    left: 0;
+    top: 22%;
+    bottom: 22%;
+    width: 4px;
+    border-radius: 0 4px 4px 0;
+    background: #ff5722;
+    opacity: 0;
+    transform: scaleY(0.4);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Active State */
 .sidebar-option.active {
-    background-color: #fff0ed;
-    border-color: tomato;
+    background: #fff5f2;
+    border-color: rgba(255, 87, 34, 0.2);
+    box-shadow: 0 4px 16px -4px rgba(255, 87, 34, 0.12);
 }
 
+.sidebar-option.active .sidebar-title {
+    color: #ff5722;
+    font-weight: 700;
+}
 
+.sidebar-option.active .sidebar-subtitle {
+    color: #ea580c;
+}
 
+.sidebar-option.active .sidebar-active-indicator {
+    opacity: 1;
+    transform: scaleY(1);
+}
+
+.sidebar-option.active .sidebar-icon-wrap {
+    background: linear-gradient(135deg, #ff6347, #ff4500);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 4px 10px rgba(255, 87, 34, 0.3);
+}
+
+/* Sidebar Bottom Section */
+.sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* Store quick jump button */
+.sidebar-store-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sidebar-store-link:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+}
+
+.store-link-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.store-link-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.sidebar-store-link:hover .store-link-icon {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: transparent;
+}
+
+.store-link-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.store-link-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.store-link-sub {
+    font-size: 10.5px;
+    color: #64748b;
+    line-height: 1.2;
+}
+
+.store-external-arrow {
+    color: #94a3b8;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-store-link:hover .store-external-arrow {
+    color: #2563eb;
+    transform: translate(2px, -2px);
+}
+
+/* System status card */
+.sidebar-status-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #fbfcfe;
+    border: 1px solid #edf2f7;
+    border-radius: 10px;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-indicator {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+.status-pulse-ring {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.4);
+    animation: statusPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes statusPulse {
+    0%, 100% {
+        transform: scale(0.8);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+.status-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.version-tag {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+/* Tablet / Responsive view */
+@media (max-width: 900px) {
+    .admin-sidebar {
+        width: 76px;
+        min-width: 76px;
+        padding: 20px 8px;
+        align-items: center;
+    }
+
+    .sidebar-section-header,
+    .sidebar-subtitle,
+    .sidebar-title,
+    .store-link-text,
+    .store-external-arrow,
+    .status-text,
+    .version-tag {
+        display: none;
+    }
+
+    .sidebar-option {
+        padding: 8px;
+        justify-content: center;
+        gap: 0;
+    }
+
+    .sidebar-bottom {
+        align-items: center;
+    }
+
+    .sidebar-store-link {
+        padding: 8px;
+        justify-content: center;
+    }
+
+    .sidebar-status-card {
+        padding: 8px;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-sidebar {
+        width: 64px;
+        min-width: 64px;
+        padding: 16px 6px;
+    }
+
+    .sidebar-icon-wrap {
+        width: 34px;
+        height: 34px;
+    }
+}
