@@ -5,7 +5,34 @@ import Razorpay from "razorpay";
 const listOrders = async (req, res) => {
     try {
         const orders = await orderModel.find({ status: { $ne: "Cancelled" } }).sort({ date: -1 });
-        res.json({ success: true, data: orders });
+        const populatedOrders = await Promise.all(orders.map(async (o) => {
+            const orderObj = o.toObject();
+            let address = orderObj.address;
+            if (typeof address === "string") {
+                try {
+                    address = JSON.parse(address);
+                    orderObj.address = address;
+                } catch (e) {}
+            }
+            if (!address || typeof address !== "object") {
+                address = {};
+                orderObj.address = address;
+            }
+
+            if (!address.email && orderObj.userId) {
+                try {
+                    const u = await userModel.findById(orderObj.userId);
+                    if (u?.email) {
+                        address.email = u.email;
+                        orderObj.email = u.email;
+                    }
+                } catch (err) {}
+            } else if (address.email) {
+                orderObj.email = address.email;
+            }
+            return orderObj;
+        }));
+        res.json({ success: true, data: populatedOrders });
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: "Error" });

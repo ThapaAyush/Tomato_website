@@ -81,6 +81,14 @@
     margin: 0;
 }
 
+.order-item-email {
+    margin: 2px 0 0;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 500;
+    word-break: break-all;
+}
+
 .order-item-count {
     color: #555555;
     font-weight: 500;

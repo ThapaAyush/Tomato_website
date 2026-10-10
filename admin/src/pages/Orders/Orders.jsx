@@ -142,6 +142,10 @@ const Orders = ({ url }) => {
                     {address.phone && (
                       <p className='order-item-phone'>{address.phone}</p>
                     )}
+
+                    {(address.email || order.email) && (
+                      <p className='order-item-email'>{address.email || order.email}</p>
+                    )}
                   </div>
 
                   <p className='order-item-count'>Items: {order.items?.length || 0}</p>
