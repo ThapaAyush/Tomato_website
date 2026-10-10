@@ -18,9 +18,13 @@ const Navbar = ({ setShowLogin }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
 
-  const { getTotalCartAmount, token, setToken, food_list, addToCart, url, role, setRole } = useContext(StoreContext);
+  const { getTotalCartAmount, getUniqueItemCount, cartItems, token, setToken, food_list, addToCart, url, role, setRole } = useContext(StoreContext);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const uniqueItemCount = getUniqueItemCount 
+    ? getUniqueItemCount() 
+    : Object.values(cartItems || {}).filter((qty) => Number(qty) > 0).length;
 
   const isHomePage = location.pathname === '/' || location.pathname === '/home';
 
@@ -188,10 +192,14 @@ const Navbar = ({ setShowLogin }) => {
         </button>
 
         <div className="navbar-search-icon">
-          <Link to='/cart' title="Cart">
+          <Link to='/cart' title="Cart" className="navbar-cart-link">
             <img src={assets.basket_icon} alt="Cart" />
+            {uniqueItemCount > 0 && (
+              <span className="cart-count-badge" aria-label={`${uniqueItemCount} distinct items in cart`}>
+                {uniqueItemCount > 99 ? '99+' : uniqueItemCount}
+              </span>
+            )}
           </Link>
-          {getTotalCartAmount() > 0 && <div className="dot"></div>}
         </div>
 
         {!token ? (

@@ -104,6 +104,16 @@ const StoreContextProvider = (props) => {
         return totalAmount;
     }
 
+    const getUniqueItemCount = () => {
+        let count = 0;
+        for (const item in cartItems) {
+            if (cartItems[item] > 0) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     const fetchFoodList = async () => {
         try {
             const response = await axios.get(url + "/api/food/list");
@@ -162,6 +172,7 @@ const StoreContextProvider = (props) => {
         addToCart,
         removeFromCart,
         getTotalCartAmount,
+        getUniqueItemCount,
         promoCode,
         applyPromoCode,
         removePromoCode,
