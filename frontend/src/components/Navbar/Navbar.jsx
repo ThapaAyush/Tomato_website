@@ -49,13 +49,10 @@ const Navbar = ({ setShowLogin }) => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 220;
       const exploreMenuEl = document.getElementById('explore-menu');
-      const appDownloadEl = document.getElementById('add-download');
       const footerEl = document.getElementById('footer');
 
       if (footerEl && window.innerHeight + window.scrollY >= document.body.offsetHeight - 60) {
         setMenu("contact-us");
-      } else if (appDownloadEl && scrollPosition >= appDownloadEl.offsetTop) {
-        setMenu("mobile-app");
       } else if (exploreMenuEl && scrollPosition >= exploreMenuEl.offsetTop) {
         setMenu("menu");
       } else {
@@ -65,8 +62,6 @@ const Navbar = ({ setShowLogin }) => {
 
     if (location.hash === '#explore-menu') {
       setMenu("menu");
-    } else if (location.hash === '#add-download') {
-      setMenu("mobile-app");
     } else if (location.hash === '#footer') {
       setMenu("contact-us");
     } else {
@@ -173,16 +168,6 @@ const Navbar = ({ setShowLogin }) => {
           menu
         </a>
 
-        <a
-          href='#add-download'
-          onClick={(e) => {
-            e.preventDefault();
-            handleNavClick('add-download', 'mobile-app');
-          }}
-          className={menu === "mobile-app" ? "active" : ""}
-        >
-          mobile-app
-        </a>
 
         <a
           href='#footer'
