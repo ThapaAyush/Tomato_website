@@ -192,14 +192,6 @@ export const food_list = [
         category: "Deserts"
     },
     {
-        _id: "13",
-        name: "Chicken Sandwich",
-        image: food_13,
-        price: 12,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Sandwich"
-    },
-    {
         _id: "14",
         name: "Vegan Sandwich",
         image: food_14,

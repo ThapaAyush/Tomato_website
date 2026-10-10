@@ -67,7 +67,6 @@ const defaultFoods = [
   { name: "Fruit Ice Cream", description: "Food provides essential nutrients for overall health and well-being", price: 22, category: "Deserts", image: "food_10.png" },
   { name: "Jar Ice Cream", description: "Food provides essential nutrients for overall health and well-being", price: 10, category: "Deserts", image: "food_11.png" },
   { name: "Vanilla Ice Cream", description: "Food provides essential nutrients for overall health and well-being", price: 12, category: "Deserts", image: "food_12.png" },
-  { name: "Chicken Sandwich", description: "Food provides essential nutrients for overall health and well-being", price: 12, category: "Sandwich", image: "food_13.png" },
   { name: "Vegan Sandwich", description: "Food provides essential nutrients for overall health and well-being", price: 18, category: "Sandwich", image: "food_14.png" },
   { name: "Grilled Sandwich", description: "Food provides essential nutrients for overall health and well-being", price: 16, category: "Sandwich", image: "food_15.png" },
   { name: "Bread Sandwich", description: "Food provides essential nutrients for overall health and well-being", price: 24, category: "Sandwich", image: "food_16.png" },
