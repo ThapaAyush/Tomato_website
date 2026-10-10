@@ -21,15 +21,10 @@ const AiAssistant = ({ setShowLogin }) => {
     const [isOpen, setIsOpen] = useState(() => {
         return typeof window !== 'undefined' && window.location.search.includes('assistant=open');
     });
-    const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
-    const [soundEnabled, setSoundEnabled] = useState(true);
-    const [isListening, setIsListening] = useState(false);
-    const [speechSupported] = useState(() => typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition));
+    const [soundEnabled] = useState(true);
 
     const messagesEndRef = useRef(null);
-    const inputRef = useRef(null);
-    const recognitionRef = useRef(null);
     const handleSendRef = useRef(null);
 
     // Initial greeting guiding user to the category options
@@ -37,7 +32,7 @@ const AiAssistant = ({ setShowLogin }) => {
         {
             id: 'init-1',
             sender: 'ai',
-            text: 'Hi! Pick a category below or ask me to find any food on our menu.',
+            text: 'Hi! Pick a category below to explore fresh dishes from our kitchen.',
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             foodItems: [],
         }
@@ -64,52 +59,12 @@ const AiAssistant = ({ setShowLogin }) => {
         }
     }, [isOpen, fetchFoodList]);
 
-    // Speech recognition setup
-    useEffect(() => {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                setInput(transcript);
-                setIsListening(false);
-                if (handleSendRef.current) {
-                    handleSendRef.current(transcript);
-                }
-            };
-
-            recognition.onerror = () => {
-                setIsListening(false);
-            };
-
-            recognition.onend = () => {
-                setIsListening(false);
-            };
-
-            recognitionRef.current = recognition;
-        }
-    }, []);
-
     // Scroll to bottom on new message
     useEffect(() => {
         if (isOpen) {
             messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages, isTyping, isOpen]);
-
-    // Focus input when opened
-    useEffect(() => {
-        if (isOpen) {
-            const timer = setTimeout(() => {
-                inputRef.current?.focus();
-            }, 250);
-            return () => clearTimeout(timer);
-        }
-    }, [isOpen]);
 
     // Handle initial search query parameter if present
     useEffect(() => {
@@ -152,22 +107,6 @@ const AiAssistant = ({ setShowLogin }) => {
             osc.stop(ctx.currentTime + 0.35);
         } catch {
             // Audio policy blocked
-        }
-    };
-
-    // Toggle speech input
-    const toggleListening = () => {
-        if (!recognitionRef.current) return;
-        if (isListening) {
-            recognitionRef.current.stop();
-            setIsListening(false);
-        } else {
-            try {
-                recognitionRef.current.start();
-                setIsListening(true);
-            } catch {
-                setIsListening(false);
-            }
         }
     };
 
@@ -285,7 +224,7 @@ const AiAssistant = ({ setShowLogin }) => {
     };
 
     const handleSend = async (customText) => {
-        const textToSend = (typeof customText === 'string' ? customText : input).trim();
+        const textToSend = (customText || '').trim();
         if (!textToSend) return;
 
         // Add user message
@@ -297,7 +236,6 @@ const AiAssistant = ({ setShowLogin }) => {
         };
 
         setMessages(prev => [...prev, userMsg]);
-        setInput('');
         setIsTyping(true);
 
         // Simulate intelligent AI thinking delay
@@ -317,17 +255,12 @@ const AiAssistant = ({ setShowLogin }) => {
 
             setMessages(prev => [...prev, aiMsg]);
             playChime();
-        }, 550);
+        }, 500);
     };
 
     useEffect(() => {
         handleSendRef.current = handleSend;
     });
-
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-        handleSend();
-    };
 
     const handleCategoryClick = (categoryName) => {
         handleSend(categoryName);
@@ -540,46 +473,6 @@ const AiAssistant = ({ setShowLogin }) => {
                                     <span className="ai-category-name">{cat.menu_name}</span>
                                 </button>
                             ))}
-                        </div>
-                    </div>
-
-                    {/* Input Form & Action Controls */}
-                    <div className="ai-card-footer-controls">
-                        <form className="ai-input-form" onSubmit={handleFormSubmit}>
-                            <div className="ai-input-box-wrap">
-                                <input
-                                    ref={inputRef}
-                                    type="text"
-                                    className="ai-text-input"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Ask for pasta, rolls, salads, cakes under ₹150..."
-                                />
-                                {speechSupported && (
-                                    <button
-                                        type="button"
-                                        className={`ai-mic-btn ${isListening ? 'listening' : ''}`}
-                                        onClick={toggleListening}
-                                        title={isListening ? "Listening... click to stop" : "Voice search"}
-                                    >
-                                        🎙️
-                                    </button>
-                                )}
-                            </div>
-                            <button type="submit" className="ai-send-btn">
-                                Send
-                            </button>
-                        </form>
-
-                        {/* Close Pill at the bottom */}
-                        <div className="ai-bottom-close-wrap">
-                            <button
-                                type="button"
-                                className="ai-bottom-close-pill"
-                                onClick={() => setIsOpen(false)}
-                            >
-                                Close
-                            </button>
                         </div>
                     </div>
                 </div>
