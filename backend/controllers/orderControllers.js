@@ -18,7 +18,36 @@ const getUserOrders = async (req, res) => {
         if (!userId) {
             return res.json({ success: false, message: "User not authenticated" });
         }
-        const orders = await orderModel.find({ userId, status: { $ne: "Cancelled" } }).sort({ date: -1 });
+
+        // Look up the current user to find their registered email
+        const user = await userModel.findById(userId);
+        const email = user?.email?.trim()?.toLowerCase() || req.query?.email?.trim()?.toLowerCase() || req.body?.email?.trim()?.toLowerCase();
+
+        let query = {};
+        if (email) {
+            // Find all user IDs associated with this same email (e.g. Customer and Admin roles)
+            const usersWithSameEmail = await userModel.find({
+                email: { $regex: new RegExp(`^${email}$`, "i") }
+            }).select("_id");
+
+            const allUserIds = usersWithSameEmail.map((u) => String(u._id));
+            if (!allUserIds.includes(String(userId))) {
+                allUserIds.push(String(userId));
+            }
+
+            // Find all orders placed under this email or by any user account with this email
+            query = {
+                $or: [
+                    { userId: { $in: allUserIds } },
+                    { "address.email": { $regex: new RegExp(`^${email}$`, "i") } }
+                ],
+                status: { $ne: "Cancelled" }
+            };
+        } else {
+            query = { userId, status: { $ne: "Cancelled" } };
+        }
+
+        const orders = await orderModel.find(query).sort({ date: -1 });
         res.json({ success: true, data: orders });
     } catch (error) {
         console.log("getUserOrders error:", error);

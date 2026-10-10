@@ -126,7 +126,11 @@ const AiAssistant = ({ setShowLogin }) => {
             }
 
             try {
-                const response = await axios.get(`${url}/api/order/my-orders`, { headers: { token } });
+                const userEmail = localStorage.getItem('userEmail') || '';
+                const response = await axios.get(`${url}/api/order/my-orders`, {
+                    headers: { token },
+                    params: userEmail ? { email: userEmail } : {},
+                });
                 const userOrders = response.data?.data || [];
                 if (userOrders.length > 0) {
                     const latest = userOrders[0];

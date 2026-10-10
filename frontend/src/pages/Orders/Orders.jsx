@@ -25,8 +25,10 @@ const Orders = ({ setShowLogin }) => {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
 
+      const userEmail = localStorage.getItem('userEmail') || '';
       const response = await axios.get(`${url}/api/order/my-orders`, {
         headers: { token: activeToken },
+        params: userEmail ? { email: userEmail } : {},
       });
 
       if (response.data?.success) {
