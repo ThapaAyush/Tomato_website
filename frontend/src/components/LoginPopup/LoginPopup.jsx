@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import './LoginPopup.css'
 import { assets } from '../../assets/assets'
 import { StoreContext } from '../../context/StoreContext'
