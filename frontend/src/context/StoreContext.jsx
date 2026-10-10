@@ -6,6 +6,9 @@ const StoreContextProvider = (props) => {
     const storageKey = "food-del-cart";
 
     const [cartItems, setCartItems] = useState(() => {
+        const savedToken = localStorage.getItem("token");
+        if (!savedToken) return {};
+
         const savedCart = localStorage.getItem(storageKey);
         if (!savedCart) return {};
 
@@ -19,6 +22,29 @@ const StoreContextProvider = (props) => {
     const url = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
     const [token, setToken] = useState(() => localStorage.getItem("token") || "");
     const [food_list, setFoodList] = useState([]);
+
+    const [showLogin, setShowLogin] = useState(() => {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            return params.get("login") === "true" || params.get("signin") === "true";
+        } catch {
+            return false;
+        }
+    });
+    const [loginState, setLoginState] = useState("Login");
+    const [authNotice, setAuthNotice] = useState("");
+
+    const openLoginModal = (notice = "") => {
+        setAuthNotice(notice);
+        setLoginState("Login");
+        setShowLogin(true);
+    };
+
+    const openSignUpModal = (notice = "") => {
+        setAuthNotice(notice);
+        setLoginState("Sign Up");
+        setShowLogin(true);
+    };
 
     const [role, setRole] = useState(() => localStorage.getItem("role") || "Customer");
     const [promoCode, setPromoCode] = useState(() => localStorage.getItem("food-del-promo") || "");
@@ -61,6 +87,10 @@ const StoreContextProvider = (props) => {
     };
 
     const addToCart = async (itemId) => {
+        if (!token) {
+            openSignUpModal("Please sign up to add items to your cart");
+            return false;
+        }
         setCartItems((prev) => ({
             ...prev,
             [itemId]: (prev[itemId] || 0) + 1,
@@ -68,6 +98,7 @@ const StoreContextProvider = (props) => {
         if (token) {
             await axios.post(url+"/api/cart/add",{itemId},{headers:{token}})
         }
+        return true;
     }
 
     const removeFromCart = async (itemId) => {
@@ -158,8 +189,17 @@ const StoreContextProvider = (props) => {
     }, [])
 
     useEffect(() => {
-        localStorage.setItem(storageKey, JSON.stringify(cartItems));
-    }, [cartItems])
+        if (!token) {
+            setCartItems({});
+            localStorage.removeItem(storageKey);
+        }
+    }, [token])
+
+    useEffect(() => {
+        if (token) {
+            localStorage.setItem(storageKey, JSON.stringify(cartItems));
+        }
+    }, [cartItems, token])
 
     const contextValue = {
         food_list,
@@ -181,6 +221,14 @@ const StoreContextProvider = (props) => {
         setToken,
         role,
         setRole,
+        showLogin,
+        setShowLogin,
+        loginState,
+        setLoginState,
+        authNotice,
+        setAuthNotice,
+        openLoginModal,
+        openSignUpModal,
     }
     return (
         <StoreContext.Provider value={contextValue}>

@@ -5,14 +5,25 @@ import { StoreContext } from '../../context/StoreContext'
 import axios from "axios"
 const LoginPopup = ({ setShowLogin }) => {
 
-  const { url, setToken, setRole } = useContext(StoreContext)
+  const { url, setToken, setRole, loginState, setLoginState, authNotice, setAuthNotice } = useContext(StoreContext)
 
-  const [currState, setCurrState] = useState("Login")
+  const [currState, setCurrState] = useState(loginState || "Login")
   const [data, setData] = useState({
     name: "",
     email: "",
     password: ""
   })
+
+  useEffect(() => {
+    if (loginState) {
+      setCurrState(loginState);
+    }
+  }, [loginState]);
+
+  const closePopup = () => {
+    if (setShowLogin) setShowLogin(false);
+    if (setAuthNotice) setAuthNotice("");
+  };
 
   const onChangeHandler = (event) => {
     const name = event.target.name;
@@ -43,7 +54,7 @@ const LoginPopup = ({ setShowLogin }) => {
         if (response.data.name || data.name) {
           localStorage.setItem("userName", response.data.name || data.name);
         }
-        setShowLogin(false);
+        closePopup();
       } else {
         alert(response.data.message)
       }
@@ -53,12 +64,20 @@ const LoginPopup = ({ setShowLogin }) => {
   }
 
   return (
-    <div className='login-popup'>
-      <form onSubmit={onlogin} action='' className='login-popup-container'>
+    <div className='login-popup' onClick={closePopup}>
+      <form onSubmit={onlogin} action='' className='login-popup-container' onClick={(e) => e.stopPropagation()}>
         <div className='login-popup-title'>
           <h2>{currState}</h2>
-          <img onClick={() => setShowLogin(false)} src={assets.cross_icon} alt='' />
+          <img onClick={closePopup} src={assets.cross_icon} alt='Close' />
         </div>
+
+        {authNotice && (
+          <div className='login-popup-notice'>
+            <span className='notice-icon'>🔒</span>
+            <span className='notice-text'>{authNotice}</span>
+          </div>
+        )}
+
         <div className="login-popup-inputs">
           {currState === "Login" ? <></> : (
             <input
@@ -96,8 +115,8 @@ const LoginPopup = ({ setShowLogin }) => {
           <p>By continuing, i agree to the terms of use & privacy policy</p>
         </div>
         {currState === "Login"
-          ? <p>Create a new account? <span onClick={() => setCurrState("Sign Up")}>Click here</span></p>
-          : <p>Already have an account?<span onClick={() => setCurrState("Login")}>Login here</span></p>}
+          ? <p>Create a new account? <span onClick={() => { setCurrState("Sign Up"); if (setLoginState) setLoginState("Sign Up"); }}>Click here</span></p>
+          : <p>Already have an account?<span onClick={() => { setCurrState("Login"); if (setLoginState) setLoginState("Login"); }}>Login here</span></p>}
       </form>
     </div>
   )

@@ -18,7 +18,7 @@ const Navbar = ({ setShowLogin }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
 
-  const { getTotalCartAmount, getUniqueItemCount, cartItems, token, setToken, food_list, addToCart, url, role, setRole } = useContext(StoreContext);
+  const { getTotalCartAmount, getUniqueItemCount, cartItems, token, setToken, food_list, addToCart, url, role, setRole, clearCart, openLoginModal } = useContext(StoreContext);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -114,6 +114,7 @@ const Navbar = ({ setShowLogin }) => {
     localStorage.removeItem("userName");
     localStorage.removeItem("userEmail");
     setToken("");
+    if (clearCart) clearCart();
     if (setRole) setRole("Customer");
     setIsProfileOpen(false);
     navigate("/");
@@ -203,11 +204,15 @@ const Navbar = ({ setShowLogin }) => {
         </div>
 
         {!token ? (
-
-          <button onClick={() => setShowLogin(true)}>
+          <button onClick={() => {
+            if (openLoginModal) {
+              openLoginModal();
+            } else if (setShowLogin) {
+              setShowLogin(true);
+            }
+          }}>
             sign in
           </button>
-
         ) : (
 
           <div 

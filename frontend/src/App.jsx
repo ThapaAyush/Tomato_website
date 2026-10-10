@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 
 import Navbar from './components/Navbar/Navbar'
 
@@ -11,17 +11,10 @@ import Orders from './pages/Orders/Orders'
 import Footer from './components/Footer/Footer'
 import LoginPopup from './components/LoginPopup/LoginPopup'
 import AiAssistant from './components/AiAssistant/AiAssistant'
+import { StoreContext } from './context/StoreContext'
 
 const App = () => {
-
-  const [showLogin, setShowLogin] = useState(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      return params.get("login") === "true" || params.get("signin") === "true";
-    } catch {
-      return false;
-    }
-  });
+  const { showLogin, setShowLogin } = useContext(StoreContext);
 
   useEffect(() => {
     try {
@@ -33,7 +26,7 @@ const App = () => {
     } catch (e) {
       console.error(e);
     }
-  }, []);
+  }, [setShowLogin]);
 
   return (
     <>

@@ -6,18 +6,35 @@ import { StoreContext } from '../../context/StoreContext';
 
 const FoodItem = ({ id, name, price, description, image }) => {
 
-    const {cartItems, addToCart, removeFromCart,url} = useContext(StoreContext);
+    const { cartItems, addToCart, removeFromCart, url, token, openSignUpModal } = useContext(StoreContext);
     const imageUrl = image.startsWith("/") ? image : `${url}/images/${image}`;
+
+    const handleAdd = () => {
+        if (!token) {
+            if (openSignUpModal) {
+                openSignUpModal("Please sign up to add items to your cart");
+            }
+            return;
+        }
+        addToCart(id);
+    };
+
     return (
         <div className='food-item' id={`food-item-${id}`}>
             <div className="food-item-img-container">
                 <img className='food-item-image' src={imageUrl} alt={name} />
-                {!cartItems[id]
-                    ? <img className='add' onClick={() => addToCart(id)} src={assets.add_icon_white} alt="" />
+                {!token || !cartItems[id]
+                    ? <img
+                        className='add'
+                        onClick={handleAdd}
+                        src={assets.add_icon_white}
+                        alt="Add food item"
+                        title={token ? "Add to cart" : "Sign up to add food"}
+                      />
                     : <div className='food-item-counter'>
-                        <img onClick={() => removeFromCart(id)} src={assets.remove_icon_red} />
+                        <img onClick={() => removeFromCart(id)} src={assets.remove_icon_red} alt="Remove" />
                         <p>{cartItems[id]}</p>
-                        <img onClick={() => addToCart(id)} src={assets.add_icon_green} />
+                        <img onClick={handleAdd} src={assets.add_icon_green} alt="Add more" />
                     </div>
                 }
             </div>
