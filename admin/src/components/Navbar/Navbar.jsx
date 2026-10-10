@@ -32,7 +32,7 @@ const Navbar = ({ onLogout }) => {
       localStorage.removeItem("userEmail");
       localStorage.removeItem("userName");
       localStorage.removeItem("passwordHashKey");
-      window.location.href = `${frontendUrl}/?login=true`;
+      window.location.reload();
     }
   };
 
