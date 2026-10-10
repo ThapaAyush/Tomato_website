@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import './Footer.css';
 import { assets } from '../../assets/assets';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { StoreContext } from '../../context/StoreContext';
 
 const Footer = () => {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { token, openSignUpModal } = useContext(StoreContext) || {};
 
   const handleHomeClick = (e) => {
     e.preventDefault();
@@ -38,12 +40,24 @@ const Footer = () => {
 
   const handleCartClick = (e) => {
     e.preventDefault();
+    if (!token) {
+      if (openSignUpModal) {
+        openSignUpModal("Please sign up to access your cart");
+      }
+      return;
+    }
     navigate('/cart');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleOrdersClick = (e) => {
     e.preventDefault();
+    if (!token) {
+      if (openSignUpModal) {
+        openSignUpModal("Please sign up to view your orders");
+      }
+      return;
+    }
     navigate('/orders');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

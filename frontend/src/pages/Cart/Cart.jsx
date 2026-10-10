@@ -14,12 +14,24 @@ const Cart = () => {
     applyPromoCode,
     removePromoCode,
     getDiscountAmount,
-    url
+    url,
+    token,
+    openSignUpModal,
   } = useContext(StoreContext);
 
   const navigate = useNavigate();
   const [inputCode, setInputCode] = useState('');
   const [promoMsg, setPromoMsg] = useState({ text: '', type: '' });
+
+  // Guard: if user is not signed in, redirect to home and open Sign Up modal
+  useEffect(() => {
+    if (!token) {
+      if (openSignUpModal) {
+        openSignUpModal("Please sign up to access your cart");
+      }
+      navigate('/');
+    }
+  }, [token, navigate, openSignUpModal]);
 
   const totalAmount = getTotalCartAmount();
   const isCartEmpty = totalAmount === 0;

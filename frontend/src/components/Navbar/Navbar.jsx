@@ -18,7 +18,7 @@ const Navbar = ({ setShowLogin }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
 
-  const { getTotalCartAmount, getUniqueItemCount, cartItems, token, setToken, food_list, addToCart, url, role, setRole, clearCart, openLoginModal } = useContext(StoreContext);
+  const { getTotalCartAmount, getUniqueItemCount, cartItems, token, setToken, food_list, addToCart, url, role, setRole, clearCart, openLoginModal, openSignUpModal } = useContext(StoreContext);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -193,9 +193,23 @@ const Navbar = ({ setShowLogin }) => {
         </button>
 
         <div className="navbar-search-icon">
-          <Link to='/cart' title="Cart" className="navbar-cart-link">
+          <Link
+            to={token ? '/cart' : '#'}
+            title={token ? "Cart" : "Sign up to access cart"}
+            className="navbar-cart-link"
+            onClick={(e) => {
+              if (!token) {
+                e.preventDefault();
+                if (openSignUpModal) {
+                  openSignUpModal("Please sign up to access your cart");
+                } else if (setShowLogin) {
+                  setShowLogin(true);
+                }
+              }
+            }}
+          >
             <img src={assets.basket_icon} alt="Cart" />
-            {uniqueItemCount > 0 && (
+            {token && uniqueItemCount > 0 && (
               <span className="cart-count-badge" aria-label={`${uniqueItemCount} distinct items in cart`}>
                 {uniqueItemCount > 99 ? '99+' : uniqueItemCount}
               </span>
