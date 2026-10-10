@@ -5,10 +5,8 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 
 const Login = ({ url, onLoginSuccess }) => {
-  const [currState, setCurrState] = useState('Login')
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState({
-    name: '',
     email: '',
     password: ''
   })
@@ -23,11 +21,6 @@ const Login = ({ url, onLoginSuccess }) => {
     setLoading(true)
 
     const cleanEmail = (data.email || '').trim().toLowerCase()
-    if (currState === 'Sign Up') {
-      toast.error('Admin registration is disabled. Only the designated administrator can access the admin panel.')
-      setLoading(false)
-      return
-    }
 
     if (cleanEmail !== 'ayush108ayush108@gmail.com' || data.password !== '123qweasd') {
       toast.error('Invalid email or password for Admin Panel')
@@ -49,7 +42,7 @@ const Login = ({ url, onLoginSuccess }) => {
         const token = response.data.token
         const role = response.data.role || 'Admin'
         const email = response.data.email || data.email
-        const name = response.data.name || data.name || 'Administrator'
+        const name = response.data.name || 'Administrator'
 
         localStorage.setItem('token', token)
         localStorage.setItem('role', role)
@@ -59,7 +52,7 @@ const Login = ({ url, onLoginSuccess }) => {
           localStorage.setItem('passwordHashKey', response.data.passwordHashKey)
         }
 
-        toast.success(currState === 'Login' ? 'Logged in successfully' : 'Admin account created')
+        toast.success('Logged in successfully')
 
         if (onLoginSuccess) {
           onLoginSuccess({ token, role, email, name })
@@ -82,21 +75,10 @@ const Login = ({ url, onLoginSuccess }) => {
       <form onSubmit={handleSubmit} className='login-box'>
         <div className='login-header'>
           <img src={assets.logo} alt="Tomato Logo" className='login-logo' />
-          <h2>Admin {currState}</h2>
+          <h2>Admin Login</h2>
         </div>
 
         <div className='login-inputs'>
-          {currState === 'Sign Up' && (
-            <input
-              name='name'
-              type='text'
-              value={data.name}
-              onChange={onChangeHandler}
-              placeholder='Your name'
-              required
-            />
-          )}
-
           <input
             name='email'
             type='email'
@@ -118,22 +100,11 @@ const Login = ({ url, onLoginSuccess }) => {
         </div>
 
         <button type='submit' disabled={loading}>
-          {loading ? 'Please wait...' : currState === 'Login' ? 'Login' : 'Sign Up'}
+          {loading ? 'Please wait...' : 'Login'}
         </button>
 
         <div className='login-footer'>
-          {currState === 'Login' ? (
-            <p>
-              Don't have an admin account?{' '}
-              <span onClick={() => setCurrState('Sign Up')}>Sign up</span>
-            </p>
-          ) : (
-            <p>
-              Already have an admin account?{' '}
-              <span onClick={() => setCurrState('Login')}>Login here</span>
-            </p>
-          )}
-          <a href={frontendUrl} className='login-back-link'>← Back to Website</a>
+          <a href={frontendUrl} className='login-back-link'>• Back to Website</a>
         </div>
       </form>
     </div>
