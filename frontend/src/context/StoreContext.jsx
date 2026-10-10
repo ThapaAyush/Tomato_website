@@ -1,8 +1,5 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
-import { food_list as sampleFoodList } from "../assets/assets";
-
-
 export const StoreContext = createContext(null)
 
 const StoreContextProvider = (props) => {
@@ -21,7 +18,7 @@ const StoreContextProvider = (props) => {
     });
     const url = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
     const [token, setToken] = useState(() => localStorage.getItem("token") || "");
-    const [food_list, setFoodList] = useState(sampleFoodList)
+    const [food_list, setFoodList] = useState([]);
 
     const [role, setRole] = useState(() => localStorage.getItem("role") || "Customer");
     const [promoCode, setPromoCode] = useState(() => localStorage.getItem("food-del-promo") || "");
@@ -166,6 +163,7 @@ const StoreContextProvider = (props) => {
 
     const contextValue = {
         food_list,
+        fetchFoodList,
         cartItems,
         setCartItems,
         clearCart,

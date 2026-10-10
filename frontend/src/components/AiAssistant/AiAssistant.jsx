@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { StoreContext } from '../../context/StoreContext';
-import { assets } from '../../assets/assets';
+import { assets, menu_list } from '../../assets/assets';
 import './AiAssistant.css';
 
 const AiAssistant = ({ setShowLogin }) => {
     const context = useContext(StoreContext) || {};
     const {
         food_list = [],
+        fetchFoodList,
         cartItems = {},
         addToCart = () => {},
         removeFromCart = () => {},
@@ -31,28 +32,37 @@ const AiAssistant = ({ setShowLogin }) => {
     const recognitionRef = useRef(null);
     const handleSendRef = useRef(null);
 
-    // Initial conversation matching user's reference image
+    // Initial greeting guiding user to the category options
     const [messages, setMessages] = useState([
         {
             id: 'init-1',
             sender: 'ai',
-            text: 'Hi! I can help you find food or check your latest order.',
+            text: 'Hi! Pick a category below or ask me to find any food on our menu.',
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             foodItems: [],
         }
     ]);
 
-    // Quick suggestion pills matching user's reference image
-    const quickPills = [
-        "Find vegetarian food",
-        "Show food under 500",
-        "Track my latest order",
-        "Delicious pasta & noodles",
-        "Crispy rolls & sandwiches",
-        "Sweet desserts & cakes",
-        "Healthy fresh salads",
-        "Surprise me with chef picks"
-    ];
+    // Fetch fresh food list strictly from backend API
+    const getBackendFoodList = async () => {
+        try {
+            const response = await axios.get(`${url}/api/food/list`);
+            const items = response.data?.data;
+            if (Array.isArray(items) && items.length > 0) {
+                return items;
+            }
+        } catch (err) {
+            console.error("Unable to load foods from backend API:", err);
+        }
+        return Array.isArray(food_list) ? food_list : [];
+    };
+
+    // When assistant opens, refresh the backend food list
+    useEffect(() => {
+        if (isOpen && fetchFoodList) {
+            fetchFoodList();
+        }
+    }, [isOpen, fetchFoodList]);
 
     // Speech recognition setup
     useEffect(() => {
@@ -119,7 +129,7 @@ const AiAssistant = ({ setShowLogin }) => {
         setIsOpen(true);
     };
 
-    // Gentle robot sound chime
+    // Gentle chime
     const playChime = () => {
         if (!soundEnabled) return;
         try {
@@ -130,8 +140,8 @@ const AiAssistant = ({ setShowLogin }) => {
             const gain = ctx.createGain();
 
             osc.type = "sine";
-            osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-            osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
 
             gain.gain.setValueAtTime(0.06, ctx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
@@ -141,7 +151,7 @@ const AiAssistant = ({ setShowLogin }) => {
             osc.start();
             osc.stop(ctx.currentTime + 0.35);
         } catch {
-            // Audio context failed or blocked by autoplay policy
+            // Audio policy blocked
         }
     };
 
@@ -161,7 +171,7 @@ const AiAssistant = ({ setShowLogin }) => {
         }
     };
 
-    // Smart AI processing engine
+    // Smart AI processing engine - fetches and searches ONLY backend data
     const processAiQuery = async (queryText) => {
         const q = queryText.toLowerCase().trim();
 
@@ -189,7 +199,7 @@ const AiAssistant = ({ setShowLogin }) => {
                     };
                 } else {
                     return {
-                        text: "You don't have any past orders yet. Browse our menu to place your first delicious meal!",
+                        text: "You don't have any past orders yet. Select a category below to explore our fresh menu!",
                         foodItems: []
                     };
                 }
@@ -202,157 +212,75 @@ const AiAssistant = ({ setShowLogin }) => {
             }
         }
 
-        // 2. Budget / price filtering
+        // Fetch fresh food items strictly from backend API
+        const backendFoods = await getBackendFoodList();
+
+        // 2. Check if the user selected/queried a category from ExploreMenu (Image 2)
+        const matchedCategory = menu_list.find(cat => {
+            const catName = cat.menu_name.toLowerCase();
+            return q === catName || q === `show ${catName}` || q === `show me ${catName}` || q.includes(catName);
+        });
+
+        if (matchedCategory) {
+            const catName = matchedCategory.menu_name;
+            const categoryDishes = backendFoods.filter(
+                item => item.category?.toLowerCase() === catName.toLowerCase()
+            );
+
+            if (categoryDishes.length > 0) {
+                return {
+                    text: `Here are our freshly prepared ${catName} dishes from our kitchen: 🍽️`,
+                    foodItems: categoryDishes
+                };
+            } else {
+                return {
+                    text: `Currently no dishes found under ${catName} in the kitchen. Here are other fresh dishes for you:`,
+                    foodItems: backendFoods.slice(0, 4)
+                };
+            }
+        }
+
+        // 3. Price / Budget filter
         const budgetMatch = q.match(/under\s*\$?(\d+)/i) || q.match(/less\s*than\s*\$?(\d+)/i);
         let maxPrice = null;
         if (budgetMatch) {
             maxPrice = parseFloat(budgetMatch[1]);
-        } else if (q.includes('cheap') || q.includes('budget') || q.includes('affordable')) {
-            maxPrice = 14;
         }
 
-        // Filter out non-veg items for default recommendations
-        const isNonVegItem = (item) => {
-            const text = `${item.name} ${item.description}`.toLowerCase();
-            return text.includes('chicken') || text.includes('meat') || text.includes('fish') || text.includes('prawn');
-        };
+        // 4. Keyword / name / description matching across backend food data
+        let matches = backendFoods.filter(item => {
+            const name = (item.name || '').toLowerCase();
+            const desc = (item.description || '').toLowerCase();
+            const cat = (item.category || '').toLowerCase();
+            return name.includes(q) || desc.includes(q) || cat.includes(q);
+        });
 
-        const vegFoodList = food_list.filter(item => !isNonVegItem(item));
-
-        // Check if user explicitly asks for non-veg or chicken
-        const nonVegKeywords = ['chicken', 'non veg', 'non-veg', 'nonveg', 'meat', 'mutton', 'beef', 'pork', 'fish', 'prawn', 'shrimp', 'seafood', 'egg', 'lamb', 'bacon', 'ham'];
-        const isExplicitNonVegQuery = nonVegKeywords.some(keyword => q.includes(keyword));
-
-        if (isExplicitNonVegQuery) {
-            // If user specifically asked for chicken:
-            if (q.includes('chicken')) {
-                const chickenMatches = food_list.filter(item => isNonVegItem(item) && item.name.toLowerCase().includes('chicken'));
-
-                // If user asked for a chicken dish we don't serve (e.g. chicken biryani, chicken pizza, etc.)
-                const unhandledChickenDishes = ['biryani', 'pizza', 'burger', 'curry', 'tikka', 'soup', 'rice'];
-                if (unhandledChickenDishes.some(d => q.includes(d))) {
-                    return {
-                        text: `We're so sorry, we don't have "${queryText}" on our menu! 🙏 We currently only offer our signature Chicken Sandwich for non-veg, alongside our gourmet vegetarian pastas, rolls, and salads. Would you like to try one of these favorites instead? 💛`,
-                        foodItems: [...chickenMatches, ...vegFoodList.slice(0, 2)]
-                    };
-                }
-
-                if (chickenMatches.length > 0) {
-                    return {
-                        text: "Since you asked, we have our signature Chicken Sandwich on our menu! Freshly prepared, seasoned to perfection: 🥪",
-                        foodItems: chickenMatches
-                    };
-                }
-            }
-
-            // User asked for non-veg items we do NOT have (mutton, fish, beef, egg, etc.)
-            return {
-                text: `We're truly sorry, we don't serve "${queryText}" on our menu! 🙏 Almost our entire kitchen is dedicated to fresh, delicious vegetarian cuisine, handmade pastas, wholesome salads, and gourmet desserts. May we recommend these chef-special vegetarian favorites for you instead? 💛`,
-                foodItems: vegFoodList.slice(0, 3)
-            };
-        }
-
-        // 3. Dietary & keyword matching (purely vegetarian by default)
-        let matches = [];
-
-        // Vegetarian / Veg / Pure Veg
-        if (q.includes('vegetarian') || q.includes('pure veg') || q.includes('veg ') || q === 'veg') {
-            matches = vegFoodList.filter(item =>
-                item.category === 'Pure Veg' ||
-                item.category === 'Salad' ||
-                item.name.toLowerCase().includes('veg')
-            );
-        }
-        // Vegan
-        else if (q.includes('vegan')) {
-            matches = vegFoodList.filter(item =>
-                item.name.toLowerCase().includes('vegan') ||
-                item.description.toLowerCase().includes('vegan')
-            );
-        }
-        // Sweet / Desserts / Cake / Ice Cream
-        else if (q.includes('sweet') || q.includes('dessert') || q.includes('ice cream') || q.includes('cake')) {
-            matches = vegFoodList.filter(item =>
-                item.category === 'Deserts' || item.category === 'Cake'
-            );
-        }
-        // Pasta
-        else if (q.includes('pasta')) {
-            matches = vegFoodList.filter(item => item.category === 'Pasta');
-        }
-        // Noodles
-        else if (q.includes('noodle') || q.includes('noodles')) {
-            matches = vegFoodList.filter(item => item.category === 'Noodles');
-        }
-        // Rolls
-        else if (q.includes('roll') || q.includes('rolls')) {
-            matches = vegFoodList.filter(item => item.category === 'Rolls');
-        }
-        // Salad / Healthy
-        else if (q.includes('salad') || q.includes('healthy') || q.includes('diet')) {
-            matches = vegFoodList.filter(item =>
-                item.category === 'Salad' || item.name.toLowerCase().includes('salad')
-            );
-        }
-        // Sandwich (vegetarian sandwiches only)
-        else if (q.includes('sandwich')) {
-            matches = vegFoodList.filter(item => item.category === 'Sandwich');
-        }
-        // Surprise me / Best / Recommend / Popular (curated vegetarian highlights)
-        else if (q.includes('surprise') || q.includes('recommend') || q.includes('best') || q.includes('popular')) {
-            matches = [
-                vegFoodList.find(i => i.category === 'Pasta'),
-                vegFoodList.find(i => i.category === 'Rolls'),
-                vegFoodList.find(i => i.category === 'Deserts'),
-                vegFoodList.find(i => i.category === 'Pure Veg'),
-            ].filter(Boolean);
-        }
-        // General text search on name, description, and category across vegetarian items
-        else {
+        if (matches.length === 0) {
             const tokens = q.split(/\s+/).filter(t => t.length > 2);
-            matches = vegFoodList.filter(item => {
-                const name = item.name.toLowerCase();
-                const desc = item.description.toLowerCase();
-                const cat = item.category.toLowerCase();
+            matches = backendFoods.filter(item => {
+                const name = (item.name || '').toLowerCase();
+                const desc = (item.description || '').toLowerCase();
+                const cat = (item.category || '').toLowerCase();
                 return tokens.some(token => name.includes(token) || desc.includes(token) || cat.includes(token));
             });
         }
 
-        // Apply price constraint if specified
         if (maxPrice !== null) {
-            // If user typed 'under 500' in a dollar menu ($10-$24), handle gracefully
-            if (maxPrice > 100) {
-                maxPrice = 18;
-            }
-            if (matches.length > 0) {
-                const filtered = matches.filter(i => i.price <= maxPrice);
-                if (filtered.length > 0) matches = filtered;
-            } else {
-                matches = vegFoodList.filter(i => i.price <= maxPrice);
-            }
+            const priceFiltered = (matches.length > 0 ? matches : backendFoods).filter(i => i.price <= maxPrice);
+            if (priceFiltered.length > 0) matches = priceFiltered;
         }
 
-        // Format AI conversational response
         if (matches.length > 0) {
-            const topDishes = matches.slice(0, 4);
-            let intro = `I found ${topDishes.length} mouth-watering options for you! ✨`;
-            if (q.includes('veg') || q.includes('vegetarian')) {
-                intro = `Here are vibrant vegetarian favorites made with fresh ingredients: 🥗`;
-            } else if (q.includes('sweet') || q.includes('dessert') || q.includes('cake')) {
-                intro = `Craving something sweet? Here are irresistible treats: 🍰`;
-            } else if (maxPrice !== null) {
-                intro = `Great vegetarian picks matching your budget (under ₹${maxPrice}): 💰`;
-            }
             return {
-                text: intro,
-                foodItems: topDishes
+                text: `I found ${matches.length} matching options for you on our menu! ✨`,
+                foodItems: matches.slice(0, 6)
             };
         }
 
-        // Very pleasing, polite response when an item is NOT available on the menu:
+        // Polite fallback with backend recommendations
         return {
-            text: `We're so sorry, we don't have "${queryText}" on our menu right now! 🙏 Our chef prepares wonderful freshly-made dishes you'll love. Would you like to try one of these delicious favorites instead? 😊`,
-            foodItems: vegFoodList.slice(0, 3)
+            text: `We don't have "${queryText}" on our menu right now! 🙏 Here are some favorites freshly made in our kitchen:`,
+            foodItems: backendFoods.slice(0, 4)
         };
     };
 
@@ -389,7 +317,7 @@ const AiAssistant = ({ setShowLogin }) => {
 
             setMessages(prev => [...prev, aiMsg]);
             playChime();
-        }, 650);
+        }, 550);
     };
 
     useEffect(() => {
@@ -401,8 +329,8 @@ const AiAssistant = ({ setShowLogin }) => {
         handleSend();
     };
 
-    const handlePillClick = (pill) => {
-        handleSend(pill);
+    const handleCategoryClick = (categoryName) => {
+        handleSend(categoryName);
     };
 
     return (
@@ -417,9 +345,6 @@ const AiAssistant = ({ setShowLogin }) => {
                     tabIndex={0}
                     onKeyDown={(e) => e.key === 'Enter' && handleOpen()}
                 >
-
-
-                    {/* Robot 3D Figure */}
                     <div className="ai-robot-figure-wrap">
                         <img
                             src={assets.robot || "/robot.png"}
@@ -431,7 +356,7 @@ const AiAssistant = ({ setShowLogin }) => {
                 </div>
             )}
 
-            {/* Food Assistant Modal Window (Matching Reference Image 2) */}
+            {/* Food Assistant Modal Window */}
             {isOpen && (
                 <div className="ai-assistant-card" role="dialog" aria-modal="true" aria-label="Food assistant">
                     {/* Header */}
@@ -515,19 +440,30 @@ const AiAssistant = ({ setShowLogin }) => {
                                         </div>
                                     )}
 
-                                    {/* Interactive Food Results Cards */}
+                                    {/* Interactive Food Results Cards from Backend Data Only */}
                                     {msg.foodItems && msg.foodItems.length > 0 && (
                                         <div className="ai-food-cards-grid">
                                             {msg.foodItems.map((item) => {
-                                                const foodImg = item.image.startsWith('/')
-                                                    ? item.image
-                                                    : `${url}/images/${item.image}`;
+                                                const foodImg = !item.image
+                                                    ? assets.parcel_icon
+                                                    : item.image.startsWith('http://') || item.image.startsWith('https://') || item.image.startsWith('blob:')
+                                                        ? item.image
+                                                        : item.image.startsWith('/')
+                                                            ? `${url}${item.image}`
+                                                            : `${url}/images/${item.image}`;
                                                 const inCart = cartItems[item._id] || 0;
 
                                                 return (
                                                     <div key={item._id} className="ai-food-result-card">
                                                         <div className="ai-card-img-wrap">
-                                                            <img src={foodImg} alt={item.name} />
+                                                            <img 
+                                                                src={foodImg} 
+                                                                alt={item.name}
+                                                                onError={(e) => {
+                                                                    e.target.onerror = null;
+                                                                    e.target.src = assets.parcel_icon;
+                                                                }}
+                                                            />
                                                             <span className="ai-category-badge">{item.category}</span>
                                                         </div>
                                                         <div className="ai-card-info">
@@ -587,23 +523,27 @@ const AiAssistant = ({ setShowLogin }) => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Quick Suggestion Pills Bar (Matching Reference Image 2) */}
-                    <div className="ai-pills-bar">
-                        <div className="ai-pills-scroll">
-                            {quickPills.map((pill, idx) => (
+                    {/* Category Option Suggestions Bar (Matching Reference Image 2) */}
+                    <div className="ai-category-suggestions-bar">
+                        <div className="ai-categories-scroll">
+                            {menu_list.map((cat, idx) => (
                                 <button
                                     key={idx}
                                     type="button"
-                                    className="ai-pill-btn"
-                                    onClick={() => handlePillClick(pill)}
+                                    className="ai-category-chip-btn"
+                                    onClick={() => handleCategoryClick(cat.menu_name)}
+                                    title={`Explore ${cat.menu_name}`}
                                 >
-                                    {pill}
+                                    <div className="ai-category-avatar-wrap">
+                                        <img src={cat.menu_image} alt={cat.menu_name} className="ai-category-img" />
+                                    </div>
+                                    <span className="ai-category-name">{cat.menu_name}</span>
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    {/* Input Form & Action Controls (Matching Reference Image 2) */}
+                    {/* Input Form & Action Controls */}
                     <div className="ai-card-footer-controls">
                         <form className="ai-input-form" onSubmit={handleFormSubmit}>
                             <div className="ai-input-box-wrap">
@@ -631,7 +571,7 @@ const AiAssistant = ({ setShowLogin }) => {
                             </button>
                         </form>
 
-                        {/* Close Pill at the bottom (Matching Reference Image 2) */}
+                        {/* Close Pill at the bottom */}
                         <div className="ai-bottom-close-wrap">
                             <button
                                 type="button"
