@@ -11,7 +11,20 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
-  const url = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+  const getBackendUrl = () => {
+    if (import.meta.env.VITE_BACKEND_URL) {
+      return import.meta.env.VITE_BACKEND_URL;
+    }
+    if (typeof window !== "undefined" && window.location?.hostname) {
+      const hostname = window.location.hostname;
+      if (hostname !== "localhost" && hostname !== "127.0.0.1" && !hostname.includes("vercel.app")) {
+        return `http://${hostname}:4000`;
+      }
+    }
+    return "http://localhost:4000";
+  };
+
+  const url = getBackendUrl();
 
   const [token, setToken] = useState(() => {
     try {

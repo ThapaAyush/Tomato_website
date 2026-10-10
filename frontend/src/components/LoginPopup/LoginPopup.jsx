@@ -58,7 +58,14 @@ const LoginPopup = ({ setShowLogin }) => {
         alert(response.data.message)
       }
     } catch (error) {
-      alert(error.response?.data?.message ?? "Unable to connect to the server. Please try again.")
+      const serverMsg = error.response?.data?.message;
+      if (serverMsg) {
+        alert(serverMsg);
+      } else if (error.message?.includes("Network Error") || error.code === "ERR_NETWORK") {
+        alert("Cannot reach backend server. If using on a different laptop, make sure your online backend URL (VITE_BACKEND_URL) is deployed and configured.");
+      } else {
+        alert("Unable to connect to the server. Please try again.");
+      }
     }
   }
 

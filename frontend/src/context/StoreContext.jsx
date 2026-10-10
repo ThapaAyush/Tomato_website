@@ -19,8 +19,23 @@ const StoreContextProvider = (props) => {
             return {};
         }
     });
-    const url = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+
     const [token, setToken] = useState(() => localStorage.getItem("token") || "");
+
+    const getBackendUrl = () => {
+        if (import.meta.env.VITE_BACKEND_URL) {
+            return import.meta.env.VITE_BACKEND_URL;
+        }
+        if (typeof window !== "undefined" && window.location?.hostname) {
+            const hostname = window.location.hostname;
+            if (hostname !== "localhost" && hostname !== "127.0.0.1" && !hostname.includes("vercel.app")) {
+                return `http://${hostname}:4000`;
+            }
+        }
+        return "http://localhost:4000";
+    };
+
+    const url = getBackendUrl();
     const [food_list, setFoodList] = useState([]);
 
     const [showLogin, setShowLogin] = useState(() => {
