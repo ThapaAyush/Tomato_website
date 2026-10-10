@@ -85,6 +85,18 @@ const Orders = ({ url }) => {
     return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`
   }
 
+  // Format time to 12-hour format (e.g., 10:16 AM)
+  const formatTime = (dateString) => {
+    if (!dateString) return ''
+    const d = new Date(dateString)
+    if (isNaN(d.getTime())) return ''
+    return d.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    })
+  }
+
   return (
     <div className='order add'>
       <h3>Order Page</h3>
@@ -138,7 +150,14 @@ const Orders = ({ url }) => {
                     <p className='order-item-price'>
                       ₹{Number(order.amount || 0).toFixed(2)}
                     </p>
-                    <p className='order-item-date'>{formatDate(order.date)}</p>
+                    <div className='order-item-timestamp'>
+                      <span className='order-item-date'>{formatDate(order.date)}</span>
+                      {order.date && <span className='order-item-time'>{formatTime(order.date)}</span>}
+                    </div>
+                    <div className={`order-status-pill status-${(order.status || 'Food Processing').toLowerCase().replace(/\s+/g, '-')}`}>
+                      <span className='status-dot'>●</span>
+                      <span className='status-text'>{order.status || 'Food Processing'}</span>
+                    </div>
                   </div>
 
                   <div className='order-status-select-wrap'>

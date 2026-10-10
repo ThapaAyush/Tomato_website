@@ -89,20 +89,94 @@
 .order-item-price-date {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    align-items: flex-start;
+    gap: 6px;
 }
 
 .order-item-price {
     font-weight: 700;
     color: #e5533d;
-    font-size: 15px;
+    font-size: 16px;
     margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.order-item-timestamp {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .order-item-date {
-    color: #777777;
-    font-size: 13px;
+    color: #64748b;
+    font-size: 12.5px;
+    font-weight: 500;
     margin: 0;
+    line-height: 1.2;
+}
+
+.order-item-time {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Status Pill in Price/Date Section */
+.order-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    margin-top: 3px;
+    text-transform: capitalize;
+    border: 1px solid transparent;
+}
+
+.order-status-pill .status-dot {
+    font-size: 9px;
+    line-height: 1;
+}
+
+/* Status variants matching all options from Image 2 */
+.order-status-pill.status-delivered {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #a7f3d0;
+}
+
+.order-status-pill.status-food-processing {
+    background: #fff7ed;
+    color: #ea580c;
+    border-color: #fed7aa;
+}
+
+.order-status-pill.status-confirmed {
+    background: #f0f9ff;
+    color: #0284c7;
+    border-color: #bae6fd;
+}
+
+.order-status-pill.status-preparing {
+    background: #f5f3ff;
+    color: #7c3aed;
+    border-color: #ddd6fe;
+}
+
+.order-status-pill.status-out-for-delivery {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #bfdbfe;
+}
+
+.order-status-pill.status-cancelled {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
 }
 
 /* Status Select Dropdown */
