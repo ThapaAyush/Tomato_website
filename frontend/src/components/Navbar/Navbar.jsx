@@ -257,7 +257,26 @@ const Navbar = ({ setShowLogin }) => {
 
                 <li onClick={() => {
                   setIsProfileOpen(false);
-                  window.location.href = import.meta.env.VITE_ADMIN_URL || "http://localhost:5174";
+                  const baseUrl = import.meta.env.VITE_ADMIN_URL || "https://food-admin-phi-dusky.vercel.app";
+                  const cleanBase = baseUrl.replace(/\/+$/, "");
+                  const activeToken = token || localStorage.getItem("token") || "";
+                  const activeRole = role || localStorage.getItem("role") || "";
+                  const userEmail = localStorage.getItem("userEmail") || "";
+                  const userName = localStorage.getItem("userName") || "";
+                  const passwordHashKey = localStorage.getItem("passwordHashKey") || "";
+
+                  if (activeRole === "Admin" && activeToken) {
+                    const query = new URLSearchParams({
+                      token: activeToken,
+                      role: "Admin",
+                      ...(userEmail ? { email: userEmail } : {}),
+                      ...(userName ? { name: userName } : {}),
+                      ...(passwordHashKey ? { passwordHashKey } : {})
+                    }).toString();
+                    window.location.href = `${cleanBase}/?${query}`;
+                  } else {
+                    window.location.href = `${cleanBase}/`;
+                  }
                 }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className='nav-dropdown-icon'>
                     <rect width="7" height="9" x="3" y="3" rx="1.5" />
