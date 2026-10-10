@@ -22,9 +22,23 @@ const Login = ({ url, onLoginSuccess }) => {
     event.preventDefault()
     setLoading(true)
 
-    const endpoint = currState === 'Login' ? '/api/user/login' : '/api/user/register'
+    const cleanEmail = (data.email || '').trim().toLowerCase()
+    if (currState === 'Sign Up') {
+      toast.error('Admin registration is disabled. Only the designated administrator can access the admin panel.')
+      setLoading(false)
+      return
+    }
+
+    if (cleanEmail !== 'ayush108ayush108@gmail.com' || data.password !== '123qweasd') {
+      toast.error('Invalid email or password for Admin Panel')
+      setLoading(false)
+      return
+    }
+
+    const endpoint = '/api/user/login'
     const payload = {
       ...data,
+      email: cleanEmail,
       role: 'Admin'
     }
 

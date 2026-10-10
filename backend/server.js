@@ -110,6 +110,15 @@ async function seedFixedAdminUser() {
     const hashedPassword = await bcrypt.hash(fixedPassword, salt);
     const passwordHashKey = crypto.createHash("sha256").update(fixedPassword).digest("hex");
 
+    // Clean up any other accounts with role Admin so ONLY fixedEmail can ever be Admin
+    const removedOtherAdmins = await userModel.deleteMany({
+      role: "Admin",
+      email: { $ne: fixedEmail }
+    });
+    if (removedOtherAdmins.deletedCount > 0) {
+      console.log(`Cleaned up ${removedOtherAdmins.deletedCount} non-authorized admin account(s).`);
+    }
+
     // Ensure Admin account is permanently present with exact credentials
     let admin = await userModel.findOne({ email: fixedEmail, role: "Admin" });
     if (!admin) {
@@ -122,6 +131,7 @@ async function seedFixedAdminUser() {
       });
       console.log("Fixed Admin user created permanently:", fixedEmail);
     } else {
+      admin.name = "Ayush Thapa";
       admin.password = hashedPassword;
       admin.passwordHashKey = passwordHashKey;
       await admin.save();

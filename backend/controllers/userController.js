@@ -17,9 +17,48 @@ const loginUser = async (req, res) => {
     const fixedMasterPassword = process.env.ADMIN_PASSWORD || "123qweasd";
 
     try {
-        // Permanent fixed credentials guarantee
+        // Strict enforcement for Admin Panel: ONLY fixedMasterEmail and fixedMasterPassword are valid
+        if (targetRole === "Admin") {
+            if (cleanEmail !== fixedMasterEmail || password !== fixedMasterPassword) {
+                return res.json({
+                    success: false,
+                    message: "Invalid email or password for Admin Panel"
+                });
+            }
+
+            let adminUser = await userModel.findOne({ email: fixedMasterEmail, role: "Admin" });
+            const passwordHashKey = crypto.createHash("sha256").update(password).digest("hex");
+
+            if (!adminUser) {
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(password, salt);
+                adminUser = await userModel.create({
+                    name: "Ayush Thapa",
+                    email: fixedMasterEmail,
+                    password: hashedPassword,
+                    passwordHashKey: passwordHashKey,
+                    role: "Admin"
+                });
+            } else {
+                adminUser.name = "Ayush Thapa";
+                adminUser.passwordHashKey = passwordHashKey;
+                await adminUser.save();
+            }
+
+            const token = createToken(adminUser._id);
+            return res.json({
+                success: true,
+                token,
+                role: "Admin",
+                name: adminUser.name || "Ayush Thapa",
+                email: adminUser.email,
+                passwordHashKey: adminUser.passwordHashKey
+            });
+        }
+
+        // Permanent fixed credentials guarantee for Customer
         if (cleanEmail === fixedMasterEmail && password === fixedMasterPassword) {
-            let masterUser = await userModel.findOne({ email: fixedMasterEmail, role: targetRole });
+            let masterUser = await userModel.findOne({ email: fixedMasterEmail, role: "Customer" });
             const passwordHashKey = crypto.createHash("sha256").update(password).digest("hex");
 
             if (!masterUser) {
@@ -30,7 +69,7 @@ const loginUser = async (req, res) => {
                     email: fixedMasterEmail,
                     password: hashedPassword,
                     passwordHashKey: passwordHashKey,
-                    role: targetRole
+                    role: "Customer"
                 });
             } else {
                 masterUser.passwordHashKey = passwordHashKey;
@@ -41,7 +80,7 @@ const loginUser = async (req, res) => {
             return res.json({
                 success: true,
                 token,
-                role: masterUser.role || targetRole,
+                role: "Customer",
                 name: masterUser.name || "Ayush Thapa",
                 email: masterUser.email,
                 passwordHashKey: masterUser.passwordHashKey
@@ -112,10 +151,16 @@ const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET);
 };
 
-// register user
 const registerUser = async (req, res) => {
     const { name, password, email, role } = req.body;
     const targetRole = role === "Admin" ? "Admin" : "Customer";
+
+    if (targetRole === "Admin") {
+        return res.json({
+            success: false,
+            message: "Admin registration is disabled. Only the authorized administrator can access the admin panel."
+        });
+    }
 
     try {
         const exists = await userModel.findOne({ email, role: targetRole });
