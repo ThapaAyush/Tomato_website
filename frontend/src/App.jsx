@@ -39,12 +39,13 @@ const App = () => {
     <>
       {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : <></>}
 
-      {/* Fixed Sticky Navbar Header */}
+      {/* Fixed Navbar Header */}
       <header className='navbar-sticky-header'>
         <div className='navbar-inner-wrapper'>
           <Navbar setShowLogin={setShowLogin} />
         </div>
       </header>
+      <div className='navbar-spacer' aria-hidden="true"></div>
 
       <div className='app'>
 
