@@ -450,15 +450,6 @@ const AiAssistant = ({ setShowLogin }) => {
                         <div className="ai-header-actions">
                             <button
                                 type="button"
-                                className="ai-icon-btn"
-                                onClick={() => setSoundEnabled(!soundEnabled)}
-                                title={soundEnabled ? "Mute sounds" : "Enable sounds"}
-                                aria-label="Toggle sound"
-                            >
-                                {soundEnabled ? '🔔' : '🔕'}
-                            </button>
-                            <button
-                                type="button"
                                 className="ai-close-btn"
                                 onClick={() => setIsOpen(false)}
                                 title="Close Food Assistant"
