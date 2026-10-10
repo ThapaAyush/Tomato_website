@@ -13,7 +13,7 @@ const AiAssistant = ({ setShowLogin }) => {
         cartItems = {},
         addToCart = () => {},
         removeFromCart = () => {},
-        url = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000',
+        url = (import.meta.env.VITE_BACKEND_URL || 'https://food-backend-1-bnbm.onrender.com').replace(/\/+$/, ''),
         token = ''
     } = context;
     const navigate = useNavigate();

@@ -23,16 +23,8 @@ const StoreContextProvider = (props) => {
     const [token, setToken] = useState(() => localStorage.getItem("token") || "");
 
     const getBackendUrl = () => {
-        if (import.meta.env.VITE_BACKEND_URL) {
-            return import.meta.env.VITE_BACKEND_URL;
-        }
-        if (typeof window !== "undefined" && window.location?.hostname) {
-            const hostname = window.location.hostname;
-            if (hostname !== "localhost" && hostname !== "127.0.0.1" && !hostname.includes("vercel.app")) {
-                return `http://${hostname}:4000`;
-            }
-        }
-        return "http://localhost:4000";
+        const rawUrl = import.meta.env.VITE_BACKEND_URL || "https://food-backend-1-bnbm.onrender.com";
+        return rawUrl.replace(/\/+$/, "");
     };
 
     const url = getBackendUrl();
