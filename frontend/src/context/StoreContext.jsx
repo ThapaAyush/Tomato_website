@@ -31,12 +31,12 @@ const StoreContextProvider = (props) => {
             return false;
         }
     });
-    const [loginState, setLoginState] = useState("Login");
+    const [loginState, setLoginState] = useState("Sign Up");
     const [authNotice, setAuthNotice] = useState("");
 
     const openLoginModal = (notice = "") => {
         setAuthNotice(notice);
-        setLoginState("Login");
+        setLoginState("Sign Up");
         setShowLogin(true);
     };
 

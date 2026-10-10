@@ -7,7 +7,7 @@ const LoginPopup = ({ setShowLogin }) => {
 
   const { url, setToken, setRole, loginState, setLoginState, authNotice, setAuthNotice } = useContext(StoreContext)
 
-  const [currState, setCurrState] = useState(loginState || "Login")
+  const [currState, setCurrState] = useState(loginState || "Sign Up")
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -15,14 +15,13 @@ const LoginPopup = ({ setShowLogin }) => {
   })
 
   useEffect(() => {
-    if (loginState) {
-      setCurrState(loginState);
-    }
+    setCurrState(loginState || "Sign Up");
   }, [loginState]);
 
   const closePopup = () => {
     if (setShowLogin) setShowLogin(false);
     if (setAuthNotice) setAuthNotice("");
+    if (setLoginState) setLoginState("Sign Up");
   };
 
   const onChangeHandler = (event) => {

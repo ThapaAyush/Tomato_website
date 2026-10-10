@@ -219,8 +219,8 @@ const Navbar = ({ setShowLogin }) => {
 
         {!token ? (
           <button onClick={() => {
-            if (openLoginModal) {
-              openLoginModal();
+            if (openSignUpModal) {
+              openSignUpModal();
             } else if (setShowLogin) {
               setShowLogin(true);
             }
