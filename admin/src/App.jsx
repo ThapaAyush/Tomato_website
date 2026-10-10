@@ -78,7 +78,7 @@ const App = () => {
     localStorage.removeItem("passwordHashKey");
     setToken("");
     toast.success("Logged out of Admin Panel");
-    const frontendUrl = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
+    const frontendUrl = import.meta.env.VITE_FRONTEND_URL || "https://food-frontend-plum.vercel.app";
     setTimeout(() => {
       window.location.href = `${frontendUrl}/?login=true`;
     }, 300);

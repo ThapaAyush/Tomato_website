@@ -20,7 +20,7 @@ const Navbar = ({ onLogout }) => {
   const adminEmail = localStorage.getItem("userEmail") || "ayush108ayush108@gmail.com";
   const adminName = localStorage.getItem("userName") || "Ayush Thapa";
 
-  const frontendUrl = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
+  const frontendUrl = import.meta.env.VITE_FRONTEND_URL || "https://food-frontend-plum.vercel.app";
 
   const handleLogout = () => {
     setShowMenu(false);

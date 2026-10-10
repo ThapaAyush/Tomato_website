@@ -61,7 +61,7 @@ const Login = ({ url, onLoginSuccess }) => {
     }
   }
 
-  const frontendUrl = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
+  const frontendUrl = import.meta.env.VITE_FRONTEND_URL || "https://food-frontend-plum.vercel.app";
 
   return (
     <div className='login-page'>
