@@ -188,15 +188,25 @@ const Navbar = ({ setShowLogin }) => {
 
       <div className="navbar-right">
 
-        <button type='button' className='search-trigger' onClick={() => setShowSearch(true)}>
-          <img src={assets.search_icon} alt="Search" />
+        <button 
+          type='button' 
+          className='nav-action-btn search-trigger' 
+          onClick={() => setShowSearch(true)}
+          title="Search dishes & menus"
+          aria-label="Search"
+        >
+          <svg className="nav-action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
         </button>
 
         <div className="navbar-search-icon">
           <Link
             to={token ? '/cart' : '#'}
-            title={token ? "Cart" : "Sign up to access cart"}
-            className="navbar-cart-link"
+            title={token ? "Shopping Cart" : "Sign up to access cart"}
+            aria-label="Shopping Cart"
+            className="nav-action-btn navbar-cart-link"
             onClick={(e) => {
               if (!token) {
                 e.preventDefault();
@@ -208,7 +218,13 @@ const Navbar = ({ setShowLogin }) => {
               }
             }}
           >
-            <img src={assets.basket_icon} alt="Cart" />
+            <svg className="nav-action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m5 11 4-7" />
+              <path d="m19 11-4-7" />
+              <path d="M2 11h20" />
+              <path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.6-7.4" />
+              <path d="M9 15.5h6" />
+            </svg>
             {token && uniqueItemCount > 0 && (
               <span className="cart-count-badge" aria-label={`${uniqueItemCount} distinct items in cart`}>
                 {uniqueItemCount > 99 ? '99+' : uniqueItemCount}
@@ -218,13 +234,17 @@ const Navbar = ({ setShowLogin }) => {
         </div>
 
         {!token ? (
-          <button onClick={() => {
-            if (openSignUpModal) {
-              openSignUpModal();
-            } else if (setShowLogin) {
-              setShowLogin(true);
-            }
-          }}>
+          <button 
+            type="button"
+            className="nav-signin-btn"
+            onClick={() => {
+              if (openSignUpModal) {
+                openSignUpModal();
+              } else if (setShowLogin) {
+                setShowLogin(true);
+              }
+            }}
+          >
             sign in
           </button>
         ) : (
@@ -234,16 +254,20 @@ const Navbar = ({ setShowLogin }) => {
             ref={profileRef}
           >
 
-            <div 
-              className='navbar-profile-trigger'
+            <button 
+              type="button"
+              className='nav-action-btn navbar-profile-trigger'
               onClick={() => setIsProfileOpen(prev => !prev)}
-              role="button"
-              tabIndex={0}
+              aria-label="Account menu"
+              aria-expanded={isProfileOpen}
               title="Click to toggle profile menu"
             >
-              <img src={assets.profile_icon} className='navbar-profile-avatar' alt="Account" />
-              <span className='navbar-profile-badge-dot'></span>
-            </div>
+              <svg className="nav-action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <span className='navbar-profile-badge-dot' title="Active session"></span>
+            </button>
 
             <div 
               className={`nav-profile-dropdown ${isProfileOpen ? 'show' : ''}`}
@@ -261,7 +285,11 @@ const Navbar = ({ setShowLogin }) => {
 
               <ul className='nav-profile-list'>
                 <li onClick={() => { setIsProfileOpen(false); navigate('/orders'); }}>
-                  <img src={assets.bag_icon} alt="Orders" className='nav-dropdown-icon' />
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className='nav-dropdown-icon'>
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                    <path d="M3 6h18" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                  </svg>
                   <span>Orders</span>
                 </li>
 
@@ -302,7 +330,11 @@ const Navbar = ({ setShowLogin }) => {
                 <hr className='nav-dropdown-divider' />
 
                 <li onClick={() => { setIsProfileOpen(false); logout(); }}>
-                  <img src={assets.logout_icon} alt="Logout" className='nav-dropdown-icon' />
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className='nav-dropdown-icon'>
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
                   <span>Logout</span>
                 </li>
               </ul>

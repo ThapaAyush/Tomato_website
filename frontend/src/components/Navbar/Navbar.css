@@ -72,22 +72,30 @@
 
 .navbar-right {
     display: flex;
-    gap: 20px;
+    gap: 12px;
     align-items: center;
 }
 
-.navbar button {
+.navbar .nav-signin-btn,
+.navbar button:not(.nav-action-btn):not(.search-item-footer button) {
     background: transparent;
-    font-size: 16px;
+    font-size: 15px;
+    font-weight: 600;
     color: #49557e;
-    border: 1px solid tomato;
-    padding: 10px 30px;
+    border: 1.5px solid tomato;
+    padding: 8px 24px;
     border-radius: 50px;
     cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.navbar button:hover {
-    background-color: #fff4f2;
+.navbar .nav-signin-btn:hover,
+.navbar button:not(.nav-action-btn):not(.search-item-footer button):hover {
+    background-color: #ff5722;
+    border-color: #ff5722;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(255, 87, 34, 0.25);
 }
 
 .navbar-admin-btn {
@@ -124,23 +132,71 @@
     color: #d84315 !important;
 }
 
-.search-trigger {
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    background: transparent;
+/* --- Unified Modern Action Buttons (Search, Cart, Profile) --- */
+.nav-action-btn {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
     border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    padding: 0 !important;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0 !important;
+    color: #475569;
+    padding: 0 !important;
+    margin: 0;
+    cursor: pointer;
+    text-decoration: none;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    outline: none !important;
 }
 
-.search-trigger img {
+.nav-action-btn:hover {
+    background: #fff5f2 !important;
+    border-color: #ffb8a8 !important;
+    color: #ff5722 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 87, 34, 0.16);
+}
+
+.nav-action-btn:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: 0 2px 6px rgba(255, 87, 34, 0.12);
+}
+
+.nav-action-btn:focus-visible {
+    border-color: #ff5722 !important;
+    box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.25) !important;
+}
+
+/* Shared vector icon standard size and stroke */
+.nav-action-icon {
     width: 20px;
     height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    display: block;
+    flex-shrink: 0;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.2s ease;
+}
+
+.nav-action-btn:hover .nav-action-icon {
+    transform: scale(1.08);
+}
+
+.search-trigger {
+    /* Uses base .nav-action-btn */
 }
 
 .navbar-search-icon {
@@ -151,24 +207,15 @@
 }
 
 .navbar-cart-link {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.navbar-cart-link:hover {
-    transform: scale(1.08);
+    /* Uses base .nav-action-btn */
 }
 
 .cart-count-badge {
     position: absolute;
-    top: -6px;
-    right: -8px;
-    min-width: 18px;
-    height: 18px;
+    top: -5px;
+    right: -5px;
+    min-width: 19px;
+    height: 19px;
     padding: 0 4px;
     background: linear-gradient(135deg, #ff5722 0%, #ff3838 100%);
     color: #ffffff;
@@ -180,9 +227,10 @@
     align-items: center;
     justify-content: center;
     border: 2px solid #ffffff;
-    box-shadow: 0 2px 6px rgba(255, 77, 77, 0.45);
+    box-shadow: 0 2px 8px rgba(255, 77, 77, 0.45);
     pointer-events: none;
     user-select: none;
+    z-index: 2;
     animation: cartBadgePop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -233,46 +281,45 @@
 
 .navbar-profile {
     position: relative;
-    cursor: pointer;
     display: flex;
     align-items: center;
 }
 
 .navbar-profile-trigger {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Uses base .nav-action-btn */
 }
 
-.navbar-profile-trigger:hover,
-.navbar-profile.open .navbar-profile-trigger {
-    background: rgba(255, 99, 71, 0.12);
-    transform: scale(1.05);
-}
-
-.navbar-profile-avatar {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    display: block;
+.navbar-profile.open .navbar-profile-trigger,
+.navbar-profile:hover .navbar-profile-trigger {
+    background: #fff5f2 !important;
+    border-color: #ff5722 !important;
+    color: #ff5722 !important;
+    box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.16), 0 4px 12px rgba(255, 87, 34, 0.14) !important;
 }
 
 .navbar-profile-badge-dot {
     position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 8px;
-    height: 8px;
+    bottom: -1px;
+    right: -1px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
     background: #10b981;
     border: 2px solid #ffffff;
-    box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.25), 0 2px 4px rgba(16, 185, 129, 0.4);
+    pointer-events: none;
+    z-index: 2;
+    animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.18);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25), 0 2px 6px rgba(16, 185, 129, 0.5);
+    }
 }
 
 /* --- Simple Clean Customer Profile Dropdown --- */
@@ -519,38 +566,79 @@
 
 @media (max-width: 750px){
     .navbar-spacer {
-        height: 110px;
+        height: 114px;
     }
     .navbar{
-        gap: 16px;
-        padding: 16px 0;
+        gap: 10px;
+        padding: 10px 0 8px;
         flex-wrap: wrap;
     }
     .navbar .logo{
-        width: 120px;
+        width: 115px;
     }
     .navbar-menu{
         order: 3;
         width: 100%;
-        justify-content: space-between;
-        gap: 12px;
-        overflow-x: auto;
-        padding-bottom: 4px;
-        font-size: 14px;
-        white-space: nowrap;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        padding: 4px;
+        margin: 4px 0 0;
+        background: #f1f5f9;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: 999px;
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+        list-style: none;
     }
-    .navbar-menu::-webkit-scrollbar{
-        display: none;
+    .navbar-menu a{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: #64748b;
+        text-align: center;
+        text-decoration: none;
+        text-transform: capitalize;
+        white-space: nowrap;
+        transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        border-bottom: none !important;
+        padding-bottom: 7px !important;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .navbar-menu a:hover{
+        color: #ff5722;
+    }
+    .navbar-menu a:active{
+        transform: scale(0.97);
+    }
+    .navbar-menu a.active,
+    .navbar-menu .active{
+        background: #ffffff;
+        color: #ff5722 !important;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+        border-bottom: none !important;
     }
     .navbar-right{
-        gap: 14px;
+        gap: 10px;
         margin-left: auto;
     }
-    .navbar-right > img,
-    .navbar-search-icon > img{
-        width: 20px;
+    .nav-action-btn{
+        width: 39px;
+        height: 39px;
+        min-width: 39px;
+        min-height: 39px;
     }
-    .navbar button{
+    .nav-action-icon{
+        width: 19px;
+        height: 19px;
+        min-width: 19px;
+        min-height: 19px;
+    }
+    .navbar button:not(.nav-action-btn){
         padding: 8px 16px;
         font-size: 14px;
     }
@@ -569,24 +657,53 @@
 
 @media (max-width: 420px){
     .navbar-spacer {
-        height: 102px;
+        height: 106px;
     }
     .navbar{
-        gap: 10px;
-        padding: 12px 0;
+        gap: 8px;
+        padding: 8px 0 6px;
     }
     .navbar .logo{
-        width: 105px;
-    }
-    .navbar-right{
-        gap: 8px;
-    }
-    .navbar button:not(.search-trigger){
-        padding: 8px 12px;
-        font-size: 13px;
+        width: 102px;
     }
     .navbar-menu{
-        gap: 16px;
+        padding: 3px;
+        gap: 3px;
+        margin-top: 2px;
+    }
+    .navbar-menu a{
+        padding: 6px 6px;
+        padding-bottom: 6px !important;
+        font-size: 12.5px;
+    }
+    .navbar-right{
+        gap: 7px;
+    }
+    .nav-action-btn{
+        width: 35px;
+        height: 35px;
+        min-width: 35px;
+        min-height: 35px;
+    }
+    .nav-action-icon{
+        width: 17px;
+        height: 17px;
+        min-width: 17px;
+        min-height: 17px;
+    }
+    .cart-count-badge{
+        min-width: 17px;
+        height: 17px;
+        font-size: 10px;
+        top: -4px;
+        right: -4px;
+    }
+    .navbar-profile-badge-dot{
+        width: 9px;
+        height: 9px;
+    }
+    .navbar button:not(.nav-action-btn){
+        padding: 7px 12px;
         font-size: 13px;
     }
     .search-overlay{
